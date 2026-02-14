@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoxeSphare</title> <link rel="icon" type="image/png" href="https://i.ibb.co/kVFZJmn3/IMG-20260212-154521.png">
+    <style>
+        /* Eliminar recuadro azul de selección */
+        *, *:focus, *:active { 
+            outline: none !important; 
+            box-shadow: none !important; 
+            -webkit-tap-highlight-color: transparent !important; 
+        }
+        
+        /* Importar fuente personalizada */
+        @font-face {
+            font-family: 'CustomFont';
+            src: url('https://res.cloudinary.com/dcxfj6ij9/raw/upload/v1708493518/XWallpaper/Fuente/mohnlubogt1mepgeifcn.ttf') format('truetype');
+            font-display: swap;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'CustomFont', 'Segoe UI', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+        
+        body {
+            background-color: #000;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        #particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+        }
+        
+        .logo-bar {
+            background-color: rgba(0, 0, 0, 0.95);
+            width: 100%;
+            padding: 10px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            height: 35px;
+            display: block;
+        }
+        
+        /* BOTÓN DE LUPA */
+        .search-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #777;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+        
+        .search-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ff4d4d;
+        }
+        
+        .search-toggle-icon {
+            width: 26px;
+            height: 26px;
+            fill: currentColor;
+        }
+        
+        /* Panel de búsqueda flotante */
+        .search-filters-panel {
+            position: fixed;
+            top: 55px;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.98);
+            z-index: 99;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease, opacity 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .search-filters-panel.visible {
+            max-height: 600px;
+            opacity: 1;
+        }
+        
+        .search-filters-content {
+            padding: 15px;
+        }
+        
+        /* Recuadro para buscador */
+        .search-box-container {
+            background-color: rgba(5, 5, 5, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 1px solid #222;
+        }
+        
+        .search-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 10px 18px 10px 40px;
+            border-radius: 22px;
+            border: 1px solid #333;
+            font-size: 15px;
+            background-color: #111;
+            color: white;
+            transition: all 0.3s ease;
+            outline: none !important;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #444;
+            box-shadow: 0 0 0 2px rgba(100, 100, 100, 0.2);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 13px; top: 50%;
+            transform: translateY(-50%);
+            width: 16px; fill: #777;
+            pointer-events: none;
+        }
+
+        .pin-btn {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #777;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            padding: 0;
+            outline: none !important;
+        }
+        
+        .pin-btn:hover {
+            color: #ff4d4d;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .pin-btn.pinned {
+            color: #ff4d4d;
+        }
+
+        .pin-icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* BOTONES DE TIPO (TODO, IMAGENES, VIDEOS) */
+        .type-filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .type-btn {
+            background-color: #222;
+            color: #aaa;
+            border: 1px solid #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+        }
+
+        .type-btn.active {
+            background-color: #ff4d4d;
+            color: white;
+            border-color: #ff4d4d;
+            font-weight: bold;
+        }
+
+        .type-btn:hover:not(.active) {
+            background-color: #333;
+        }
+
+        .search-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .option {
+            background-color: #222;
+            color: #ccc;
+            padding: 6px 14px;
+            border-radius: 18px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #333;
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+        
+        .option:hover {
+            background-color: #333;
+            transform: translateY(-1px);
+        }
+
+        /* Recuadro filtros */
+        .filters-box-container {
+            background-color: rgba(5, 5, 5, 0.95);
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #222;
+        }
+
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .filter-label { 
+            font-size: 12px; 
+            color: #aaa; 
+            font-weight: bold;
+            text-transform: uppercase; 
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label .icon {
+            font-size: 14px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 20px;
+        }
+
+        .switch input { 
+            opacity: 0; 
+            width: 0; 
+            height: 0; 
+            outline: none !important;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #222;
+            transition: .4s;
+            border-radius: 22px;
+            border: 1px solid #333;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px; width: 14px;
+            left: 3px; bottom: 2px;
+            background-color: #aaa;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: #ff4d4d; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        .art-switch input:checked + .slider { background-color: #4CAF50; }
+        .art-switch input:checked + .slider:before { transform: translateX(20px); }
+        
+        .filter-divider {
+            width: 100%;
+            height: 1px;
+            background-color: #333;
+            margin: 8px 0;
+        }
+        
+        /* CUADRÍCULA */
+        .results-wrapper {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 15px 15px 20px 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        
+        .image-card {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #0a0a0a;
+            position: relative;
+            cursor: pointer;
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s forwards;
+        }
+
+        /* ETIQUETA DE TIPO (VIDEO/IMAGEN) */
+        .type-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 5;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+        }
+
+        .type-badge.video-badge {
+            background-color: rgba(255, 77, 77, 0.8);
+            border-color: #ff4d4d;
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .skeleton {
+            width: 100%;
+            height: 100%;
+            background-color: #0a0a0a;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            animation: skeletonPulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes skeletonPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+        }
+        
+        .image-result {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            position: relative;
+            z-index: 2;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            background-color: transparent;
+        }
+        
+        /* MODAL */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.98);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 95vw;
+            margin: 0 auto;
+            padding: 60px 0 30px 0;
+        }
+
+        .modal-image-container {
+            position: relative;
+            max-width: 100%;
+            max-height: 70vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-image, .modal-video {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        .close-arrow-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1002;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        .close-arrow-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .arrow-icon {
+            width: 20px;
+            height: 20px;
+            fill: white;
+            transform: rotate(180deg);
+        }
+
+        /* ETIQUETAS */
+        .tags-section {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 5px;
+        }
+
+        .tags-header {
+            font-size: 14px;
+            color: #aaa;
+            font-weight: bold;
+            text-transform: none;
+            letter-spacing: 0.8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .tags-header span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tags-count {
+            background-color: #333;
+            color: #ccc;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .translation-status {
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+            border: 1px solid transparent;
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+            cursor: default;
+        }
+        
+        .translating-status {
+            background-color: rgba(74, 144, 226, 0.1);
+            border-color: #4a90e2;
+            color: #4a90e2;
+            display: block;
+        }
+        
+        .translated-status {
+            background-color: rgba(0, 255, 0, 0.1);
+            border-color: #00ff00;
+            color: #00ff00;
+            display: block;
+        }
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 2px;
+            min-height: 60px;
+        }
+
+        .modal-tag {
+            background-color: #222;
+            color: #ccc;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #333;
+            display: inline-block;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        .modal-tag:hover {
+            background-color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #scrollLoading {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            color: #4a90e2;
+            font-size: 12px;
+            display: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            grid-column: 1 / -1;
+        }
+        
+        .load-more-indicator {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            color: #4a90e2;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .load-more-indicator.active {
+            display: block;
+        }
+        
+        .translating-indicator {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #4a90e2;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .no-more-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 30px;
+            color: #aaa;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .no-more-results.visible {
+            display: block;
+        }
+
+        @media (min-width: 768px) {
+            .results-wrapper {
+                grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+                gap: 16px;
+                padding: 20px 25px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .results-wrapper {
+                grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+                gap: 20px;
+            }
+            .logo { height: 42px; }
+            .logo-bar { padding: 12px 25px; }
+            .modal-tag {
+                font-size: 13px;
+                padding: 7px 16px;
+                max-width: 260px;
+            }
+            .tags-section {
+                max-width: 1000px;
+            }
+        }
+
+        @media (min-width: 1440px) {
+            .results-wrapper {
+                grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+                gap: 24px;
+            }
+            .search-filters-panel.visible {
+                max-height: 600px;
+            }
+            .search-box {
+                font-size: 16px;
+                padding: 12px 18px 12px 45px;
+            }
+            .search-icon { width: 18px; left: 15px; }
+            .pin-btn { right: 15px; }
+            .option {
+                padding: 8px 18px;
+                font-size: 13px;
+            }
+        }
+
+        @media (min-width: 1800px) {
+            .results-wrapper {
+                grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+                gap: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    
+    <div class="logo-bar">
+        <img src="https://i.ibb.co/q3tZpy1K/Logo.png" alt="Logo" class="logo">
+        <button class="search-toggle-btn" id="searchToggleBtn" title="Mostrar buscador">
+            <svg class="search-toggle-icon" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+        </button>
+    </div>
+    
+    <div class="search-filters-panel" id="searchFiltersPanel">
+        <div class="search-filters-content">
+            <div class="search-box-container">
+                <div class="search-container">
+                    <svg class="search-icon" viewBox="0 0 24 24">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                    <input type="text" class="search-box" id="searchInput" placeholder="Buscar (en inglés)...">
+                    <button class="pin-btn" id="pinBtn" title="Fijar búsqueda">
+                        <svg class="pin-icon" viewBox="0 0 24 24">
+                            <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="type-filters">
+                    <button class="type-btn active" data-type="all">Todo</button>
+                    <button class="type-btn" data-type="image">Imágenes</button>
+                    <button class="type-btn" data-type="video">Vídeos</button>
+                </div>
+
+                <div class="search-options" id="searchOptions">
+                    </div>
+            </div>
+            
+            <div class="filters-box-container">
+                <div class="filter-row">
+                    <span class="filter-label">
+                        <span class="icon">🎨</span>
+                        SOLO MOSTRAR ARTE
+                    </span>
+                    <label class="switch art-switch">
+                        <input type="checkbox" id="artToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="filter-divider"></div>
+                
+                <div class="filter-row">
+                    <span class="filter-label">
+                        <span class="icon">🔞</span>
+                        SOLO MOSTRAR +18
+                    </span>
+                    <label class="switch">
+                        <input type="checkbox" id="nsfwToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="results-wrapper" id="resultsContainer"></div>
+    <div id="scrollLoading">Buscando imágenes...</div>
+    <div class="load-more-indicator" id="loadMoreIndicator">Cargando más imágenes...</div>
+    <div class="no-more-results" id="noMoreResults">No hay más imágenes para mostrar</div>
+
+    <div class="image-modal" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-image-container" id="modalMediaContainer">
+                <img class="modal-image" id="modalImage" src="" alt="">
+            </div>
+            
+            <div class="tags-section" id="tagsSection">
+                <div class="tags-header">
+                    <span>
+                        🏷️ Etiquetas de la imagen 
+                        <span class="tags-count" id="tagsCount">0</span>
+                    </span>
+                </div>
+                
+                <div class="translation-status" id="translatingStatus">
+                    <span class="translating-indicator"></span>
+                    Traduciendo etiquetas al español...
+                </div>
+                <div class="translation-status" id="translatedStatus">
+                    ✓ Etiquetas traducidas al español
+                </div>
+                
+                <div class="tags-list" id="tagsList">
+                    </div>
+            </div>
+        </div>
+        
+        <div class="close-arrow-btn" id="closeArrowBtn">
+            <svg class="arrow-icon" viewBox="0 0 24 24">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        // API GELBOORU
+        const GEL_API_KEY = '0d1c80b323399ab231cd442933527360d97c6fd54f57dc064cc26bada3ade9221f8579cf0a2f6cb265d553866d39b443f660ffae0a28d96c8fa6064ebb77ef72';
+        const GEL_USER_ID = '1895037';
+        
+        // API RULE34
+        const R34_API_KEY = '98292e068da149bb7d1a02f400727e06a5bc26e1d4e044b0b371e8eec454484606d1d25cd3c6192802f1a33b8b7e4cd1979930172f638e101e8131fe033d22b0';
+        const R34_USER_ID = '5935306';
+
+        const proxy = "https://api.codetabs.com/v1/proxy?quest=";
+        const TRANSLATE_API = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=";
+        
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const nsfwToggle = document.getElementById('nsfwToggle');
+        const artToggle = document.getElementById('artToggle');
+        const scrollLoading = document.getElementById('scrollLoading');
+        const loadMoreIndicator = document.getElementById('loadMoreIndicator');
+        const imageModal = document.getElementById('imageModal');
+        const modalMediaContainer = document.getElementById('modalMediaContainer');
+        const tagsList = document.getElementById('tagsList');
+        const tagsCount = document.getElementById('tagsCount');
+        const closeArrowBtn = document.getElementById('closeArrowBtn');
+        const pinBtn = document.getElementById('pinBtn');
+        const searchOptions = document.getElementById('searchOptions');
+        const searchToggleBtn = document.getElementById('searchToggleBtn');
+        const searchFiltersPanel = document.getElementById('searchFiltersPanel');
+        const translatingStatus = document.getElementById('translatingStatus');
+        const translatedStatus = document.getElementById('translatedStatus');
+        const noMoreResults = document.getElementById('noMoreResults');
+        const typeButtons = document.querySelectorAll('.type-btn');
+        
+        let currentPage = 0;
+        let currentTags = '';
+        let isFetching = false;
+        let endOfAllResults = false;
+        let currentImageData = null;
+        let allPosts = [];
+        let savedTags = [];
+        let autoLoadTimer = null;
+        let isLoadingMore = false;
+        let isSearchVisible = false;
+        let currentImageTags = [];
+        let isTranslating = false;
+        let activeSearchId = null;
+        let isProcessingImage = false;
+        let imageQueue = [];
+        let isAutoLoadEnabled = true;
+        let currentTypeFilter = 'all'; 
+
+        // Función para cargar etiquetas populares al inicio
+        async function loadPopularTags() {
+            // Usamos Rule34 para obtener tendencias generales
+            const url = `https://api.rule34.xxx/index.php?page=dapi&s=tag&q=index&json=1&orderby=count&order=DESC&limit=10`;
+            
+            try {
+                const response = await fetch(proxy + encodeURIComponent(url));
+                if (response.ok) {
+                    const data = await response.json();
+                    if (Array.isArray(data)) {
+                        searchOptions.innerHTML = '';
+                        // Añadimos etiquetas guardadas primero si existen
+                        if (savedTags.length > 0) {
+                            renderSavedTags(); 
+                        }
+                        
+                        // Añadimos las populares
+                        data.forEach(tagData => {
+                            // Evitamos duplicados si ya están en guardados
+                            if (!savedTags.some(t => t.tag === tagData.name)) {
+                                const tagElement = document.createElement('div');
+                                tagElement.className = 'option';
+                                tagElement.textContent = formatTag(tagData.name);
+                                tagElement.dataset.tag = tagData.name;
+                                
+                                tagElement.addEventListener('click', () => {
+                                    searchInput.value = formatTag(tagData.name);
+                                    startSearch(tagData.name);
+                                    if (isSearchVisible) {
+                                        toggleSearchVisibility();
+                                    }
+                                });
+                                searchOptions.appendChild(tagElement);
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log("No se pudieron cargar etiquetas populares", error);
+            }
+        }
+
+        function toggleSearchVisibility() {
+            isSearchVisible = !isSearchVisible;
+            if (isSearchVisible) {
+                searchFiltersPanel.classList.add('visible');
+                setTimeout(() => searchInput.focus(), 300);
+            } else {
+                searchFiltersPanel.classList.remove('visible');
+            }
+        }
+
+        function closeSearchOnClickOutside(event) {
+            if (isSearchVisible && 
+                !searchFiltersPanel.contains(event.target) && 
+                !searchToggleBtn.contains(event.target)) {
+                toggleSearchVisibility();
+            }
+        }
+
+        function saveFilterStates() {
+            localStorage.setItem('gelbooru_nsfw_enabled', nsfwToggle.checked);
+            localStorage.setItem('gelbooru_art_enabled', artToggle.checked);
+        }
+
+        function loadFilterStates() {
+            const savedNsfwState = localStorage.getItem('gelbooru_nsfw_enabled');
+            const savedArtState = localStorage.getItem('gelbooru_art_enabled');
+            if (savedNsfwState !== null) nsfwToggle.checked = savedNsfwState === 'true';
+            if (savedArtState !== null) artToggle.checked = savedArtState === 'true';
+        }
+
+        function loadSavedTags() {
+            const saved = localStorage.getItem('gelbooru_saved_tags');
+            if (saved) {
+                savedTags = JSON.parse(saved);
+                renderSavedTags();
+            }
+        }
+
+        function saveTagsToStorage() {
+            localStorage.setItem('gelbooru_saved_tags', JSON.stringify(savedTags));
+        }
+
+        function renderSavedTags() {
+            // La lógica de renderizado principal ocurre en loadPopularTags para mantener el orden.
+            // Si las etiquetas populares fallan, podemos renderizar solo las guardadas aquí si es necesario.
+            if (searchOptions.innerHTML === '') {
+                savedTags.forEach(t => {
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'option';
+                    tagElement.textContent = t.display;
+                    tagElement.dataset.tag = t.tag;
+                    tagElement.addEventListener('click', () => {
+                        searchInput.value = t.display;
+                        startSearch(t.tag);
+                        if (isSearchVisible) toggleSearchVisibility();
+                    });
+                    searchOptions.appendChild(tagElement);
+                });
+            }
+        }
+
+        function addSavedTag(tag, display) {
+            if (!savedTags.some(t => t.tag === tag)) {
+                savedTags.push({ tag, display });
+                saveTagsToStorage();
+                
+                // Crear elemento visual
+                const tagElement = document.createElement('div');
+                tagElement.className = 'option';
+                tagElement.textContent = display;
+                tagElement.dataset.tag = tag;
+                tagElement.addEventListener('click', () => {
+                    searchInput.value = display;
+                    startSearch(tag);
+                    if (isSearchVisible) toggleSearchVisibility();
+                });
+                
+                // Insertar al principio
+                searchOptions.insertBefore(tagElement, searchOptions.firstChild);
+                updatePinButtonState(tag);
+            }
+        }
+
+        function removeSavedTag(tag) {
+            savedTags = savedTags.filter(t => t.tag !== tag);
+            saveTagsToStorage();
+            
+            // Eliminar elemento visual
+            const existing = searchOptions.querySelector(`.option[data-tag="${tag}"]`);
+            if (existing) existing.remove();
+            
+            updatePinButtonState('');
+        }
+
+        function updatePinButtonState(tag) {
+            const isPinned = savedTags.some(t => t.tag === tag);
+            pinBtn.classList.toggle('pinned', isPinned);
+        }
+
+        function formatSearchText(text) {
+            // Reemplaza comas por espacios para permitir múltiples etiquetas
+            // Ejemplo: "animated, anime" -> "animated anime"
+            return text.trim().toLowerCase().replace(/,/g, ' ');
+        }
+
+        async function translateTagsToSpanish(tagsArray) {
+            const translatedTags = [];
+            for (let tag of tagsArray) {
+                if (!tag.trim()) continue;
+                const tagText = tag.replace(/_/g, ' ');
+                try {
+                    const response = await fetch(`${TRANSLATE_API}${encodeURIComponent(tagText)}`);
+                    const data = await response.json();
+                    if (data && data[0] && data[0][0] && data[0][0][0]) {
+                        const translated = data[0][0][0];
+                        translatedTags.push({
+                            original: tag,
+                            translated: translated,
+                            display: translated.charAt(0).toUpperCase() + translated.slice(1).toLowerCase()
+                        });
+                    } else {
+                        translatedTags.push({
+                            original: tag,
+                            translated: tagText,
+                            display: tagText.charAt(0).toUpperCase() + tagText.slice(1).toLowerCase()
+                        });
+                    }
+                } catch (error) {
+                    translatedTags.push({
+                        original: tag,
+                        translated: tagText,
+                        display: tagText.charAt(0).toUpperCase() + tagText.slice(1).toLowerCase()
+                    });
+                }
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            return translatedTags;
+        }
+
+        async function fetchBooruPosts(baseUrl, apiKey, userId, tags, page) {
+            let finalTags = tags ? tags.trim() : '';
+            
+            if (artToggle.checked) {
+                finalTags += ' rating:general';
+            } else if (nsfwToggle.checked) {
+                finalTags += ' rating:explicit';
+            }
+            
+            // LÓGICA DE FILTRADO POR TIPO
+            // Aquí corregimos para que agregue "animated" correctamente para buscar videos
+            if (currentTypeFilter === 'image') {
+                finalTags += ' -animated';
+            } else if (currentTypeFilter === 'video') {
+                // Añadimos 'animated' como etiqueta adicional, no con '+'
+                // Esto permite búsquedas como "anime animated"
+                finalTags = finalTags ? `${finalTags} animated` : 'animated';
+            }
+
+            const limit = 10; 
+            const tagsParam = finalTags ? `&tags=${encodeURIComponent(finalTags)}` : '';
+            
+            const url = `${baseUrl}?page=dapi&s=post&q=index&json=1${tagsParam}&api_key=${apiKey}&user_id=${userId}&limit=${limit}&pid=${page}`;
+            
+            try {
+                const response = await fetch(proxy + encodeURIComponent(url));
+                if (!response.ok) return [];
+                const data = await response.json();
+                return data.post || (Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error("Error en fetch:", baseUrl, err);
+                return [];
+            }
+        }
+
+        async function fetchGelbooruPosts() {
+            return await fetchBooruPosts('https://gelbooru.com/index.php', GEL_API_KEY, GEL_USER_ID, currentTags, currentPage);
+        }
+
+        async function fetchRule34Posts() {
+            return await fetchBooruPosts('https://api.rule34.xxx/index.php', R34_API_KEY, R34_USER_ID, currentTags, currentPage);
+        }
+
+        function formatTag(tag) {
+            return tag.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function displayTags(tagsString) {
+            tagsList.innerHTML = '';
+            if (!tagsString) {
+                tagsList.innerHTML = '<div class="modal-tag">No hay etiquetas disponibles</div>';
+                tagsCount.textContent = '0';
+                return;
+            }
+            const tagsArray = tagsString.split(' ');
+            tagsCount.textContent = tagsArray.length;
+            currentImageTags = tagsArray;
+            tagsArray.forEach(tag => {
+                if (tag.trim()) {
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'modal-tag';
+                    tagElement.textContent = formatTag(tag);
+                    tagElement.dataset.tag = tag;
+                    tagElement.addEventListener('click', () => {
+                        closeImageModal();
+                        searchInput.value = formatTag(tag);
+                        startSearch(tag);
+                        if (isSearchVisible) toggleSearchVisibility();
+                    });
+                    tagsList.appendChild(tagElement);
+                }
+            });
+        }
+
+        function displayTranslatedTags(translatedTags) {
+            tagsList.innerHTML = '';
+            translatedTags.forEach(tagData => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'modal-tag';
+                tagElement.textContent = tagData.display;
+                tagElement.dataset.tag = tagData.original;
+                tagElement.addEventListener('click', () => {
+                    closeImageModal();
+                    searchInput.value = formatTag(tagData.original);
+                    startSearch(tagData.original);
+                    if (isSearchVisible) toggleSearchVisibility();
+                });
+                tagsList.appendChild(tagElement);
+            });
+        }
+
+        async function startAutoTranslation() {
+            if (currentImageTags.length === 0 || isTranslating) return;
+            isTranslating = true;
+            translatingStatus.classList.add('translating-status');
+            translatingStatus.style.display = 'block';
+            translatedStatus.style.display = 'none';
+            try {
+                const translatedTags = await translateTagsToSpanish(currentImageTags);
+                translatingStatus.classList.remove('translating-status');
+                translatingStatus.style.display = 'none';
+                translatedStatus.classList.add('translated-status');
+                translatedStatus.style.display = 'block';
+                displayTranslatedTags(translatedTags);
+                setTimeout(() => {
+                    translatedStatus.classList.remove('translated-status');
+                    translatedStatus.style.display = 'none';
+                }, 3000);
+            } catch (error) {
+                translatingStatus.classList.remove('translating-status');
+                translatingStatus.style.display = 'none';
+            } finally {
+                isTranslating = false;
+            }
+        }
+
+        // ABRIR MODAL CON SOPORTE DE VIDEO
+        function openImageModal(imageData) {
+            currentImageData = imageData;
+            modalMediaContainer.innerHTML = '';
+            
+            // Detectar video por extensión
+            const ext = imageData.imgUrl.split('.').pop().split('?')[0].toLowerCase();
+            const isVideo = ext === 'mp4' || ext === 'webm';
+
+            let mediaElement;
+            if (isVideo) {
+                mediaElement = document.createElement('video');
+                mediaElement.className = 'modal-video';
+                mediaElement.controls = true;
+                mediaElement.autoplay = true;
+                mediaElement.loop = true;
+                mediaElement.playsInline = true; // Importante para móviles
+                mediaElement.src = imageData.imgUrl; // URL completa del video
+            } else {
+                mediaElement = document.createElement('img');
+                mediaElement.className = 'modal-image';
+                mediaElement.src = imageData.imgUrl;
+            }
+            
+            modalMediaContainer.appendChild(mediaElement);
+            imageModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            translatingStatus.style.display = 'none';
+            translatedStatus.style.display = 'none';
+            
+            if (imageData.tags) {
+                displayTags(imageData.tags);
+                setTimeout(() => startAutoTranslation(), 500);
+            } else {
+                displayTags('');
+            }
+            imageModal.scrollTop = 0;
+        }
+
+        function closeImageModal() {
+            imageModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentImageData = null;
+            currentImageTags = [];
+            isTranslating = false;
+            
+            // Detener video
+            const video = modalMediaContainer.querySelector('video');
+            if (video) {
+                video.pause();
+                video.src = "";
+            }
+            
+            translatingStatus.style.display = 'none';
+            translatedStatus.style.display = 'none';
+        }
+
+        function isNearBottom() {
+            const scrollPosition = window.innerHeight + window.scrollY;
+            const pageHeight = document.documentElement.scrollHeight;
+            return pageHeight - scrollPosition < 500;
+        }
+
+        async function loadMoreImages() {
+            if (isFetching || endOfAllResults || isLoadingMore || !isAutoLoadEnabled) return;
+            isLoadingMore = true;
+            loadMoreIndicator.classList.add('active');
+            noMoreResults.classList.remove('visible');
+            currentPage++;
+
+            const [gelItems, r34Items] = await Promise.all([
+                fetchGelbooruPosts(),
+                fetchRule34Posts()
+            ]);
+            
+            const combinedItems = [...gelItems, ...r34Items];
+            
+            if (combinedItems.length > 0) {
+                allPosts = [...allPosts, ...combinedItems];
+                await processImagesSequentially(combinedItems);
+                setTimeout(() => {
+                    if (isNearBottom() && !isFetching && !endOfAllResults) loadMoreImages();
+                }, 1000);
+            } else {
+                endOfAllResults = true;
+                noMoreResults.classList.add('visible');
+            }
+            
+            loadMoreIndicator.classList.remove('active');
+            isLoadingMore = false;
+        }
+
+        function fixImageUrl(url) {
+            if (!url) return null;
+            if (!url.startsWith('http')) return 'https:' + url;
+            return url;
+        }
+
+        // CREAR TARJETA (CORREGIDO PARA VIDEOS)
+        function createImageCard(post, index) {
+            return new Promise((resolve) => {
+                if (!post) { resolve(); return; }
+                
+                // URL Original del archivo (para detectar si es video y para el modal)
+                const fileUrl = fixImageUrl(post.file_url);
+                if (!fileUrl) { resolve(); return; }
+
+                const ext = fileUrl.split('.').pop().split('?')[0].toLowerCase();
+                const isVideo = ext === 'mp4' || ext === 'webm';
+                const isGif = ext === 'gif';
+
+                // URL para mostrar en la cuadrícula (thumbnail/preview)
+                // Si es video MP4/WEBM, FORZAMOS usar preview_url o sample_url, NUNCA el file_url en <img>
+                let gridUrl;
+                if (isVideo) {
+                    gridUrl = fixImageUrl(post.preview_url || post.sample_url);
+                } else {
+                    // Si es imagen, intentamos sample primero, luego file
+                    gridUrl = fixImageUrl(post.sample_url || post.file_url || post.preview_url);
+                }
+
+                if (!gridUrl) { resolve(); return; }
+
+                const card = document.createElement('div');
+                card.className = 'image-card';
+                card.style.animationDelay = `${index * 0.05}s`;
+                
+                // ETIQUETA
+                const badge = document.createElement('div');
+                badge.className = 'type-badge';
+                if (isVideo || isGif) {
+                    badge.classList.add('video-badge');
+                    badge.textContent = 'VÍDEO';
+                    // Mostrar badge si es video
+                    if (currentTypeFilter === 'all' || currentTypeFilter === 'video') {
+                        card.appendChild(badge);
+                    }
+                } else {
+                    badge.textContent = 'IMAGEN';
+                    if (currentTypeFilter === 'all') {
+                        card.appendChild(badge);
+                    }
+                }
+
+                const skeleton = document.createElement('div');
+                skeleton.className = 'skeleton';
+                card.appendChild(skeleton);
+                
+                const img = document.createElement('img');
+                img.className = 'image-result';
+                img.loading = 'lazy';
+                
+                img.onload = () => skeleton.remove();
+                img.onerror = () => {
+                    // Fallback solo si no era video (si falla el preview de video, ocultamos)
+                    if (!isVideo) {
+                         const fallback = fixImageUrl(post.file_url);
+                         if (fallback && fallback !== gridUrl) {
+                             img.src = fallback;
+                             return;
+                         }
+                    }
+                    card.style.display = 'none';
+                };
+                
+                img.src = gridUrl;
+                
+                card.addEventListener('click', () => {
+                    const imageData = {
+                        imgUrl: fileUrl, // Al abrir modal, usamos el VIDEO/IMAGEN real
+                        tags: post.tags || ''
+                    };
+                    openImageModal(imageData);
+                });
+                
+                card.appendChild(img);
+                resultsContainer.appendChild(card);
+                resolve();
+            });
+        }
+
+        async function processImagesSequentially(posts) {
+            for (let i = 0; i < posts.length; i++) {
+                if (activeSearchId === null) break; 
+                await createImageCard(posts[i], i);
+                await new Promise(resolve => setTimeout(resolve, 20));
+            }
+        }
+
+        async function startSearch(tags, isNewSearch = true) {
+            if (isFetching) return;
+            isFetching = true;
+            scrollLoading.style.display = 'block';
+            loadMoreIndicator.classList.remove('active');
+            noMoreResults.classList.remove('visible');
+            
+            const searchId = Date.now().toString();
+            activeSearchId = searchId;
+            
+            if (isNewSearch) {
+                currentPage = 0;
+                endOfAllResults = false;
+                resultsContainer.innerHTML = '';
+                allPosts = [];
+                isAutoLoadEnabled = true;
+                currentTags = formatSearchText(tags);
+                updatePinButtonState(currentTags);
+            }
+
+            const [gelItems, r34Items] = await Promise.all([
+                fetchGelbooruPosts(),
+                fetchRule34Posts()
+            ]);
+            
+            const combinedItems = [...gelItems, ...r34Items];
+            
+            if (combinedItems.length > 0 && activeSearchId === searchId) {
+                allPosts = [...allPosts, ...combinedItems];
+                await processImagesSequentially(combinedItems);
+                
+                setTimeout(() => {
+                    if (!endOfAllResults && activeSearchId === searchId) {
+                        if (isNearBottom()) loadMoreImages();
+                    }
+                }, 500);
+            } else if (isNewSearch && activeSearchId === searchId) {
+                resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #aaa; padding: 40px 0;">No se encontró nada reciente.</p>';
+            }
+
+            scrollLoading.style.display = 'none';
+            isFetching = false;
+        }
+
+        function initParticles() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            let w, h, squares = [];
+            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize);
+            resize();
+            for(let i = 0; i < 70; i++) {
+                squares.push({
+                    x: Math.random() * w, y: Math.random() * h,
+                    size: Math.random() * 8 + 4,
+                    speed: Math.random() * 0.3 + 0.1,
+                    color: Math.random() > 0.5 ? '#0a0a0a' : '#050505',
+                    opacity: Math.random() * 0.4 + 0.2
+                });
+            }
+            function animate() {
+                ctx.clearRect(0, 0, w, h);
+                squares.forEach(s => {
+                    ctx.globalAlpha = s.opacity;
+                    ctx.fillStyle = s.color;
+                    ctx.fillRect(s.x, s.y, s.size, s.size);
+                    s.y -= s.speed;
+                    if(s.y < -20) { s.y = h + 20; s.x = Math.random() * w; }
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // Event Listeners
+        closeArrowBtn.addEventListener('click', closeImageModal);
+        imageModal.addEventListener('click', (e) => { if (e.target === imageModal) closeImageModal(); });
+        document.getElementById('tagsSection').addEventListener('click', (e) => e.stopPropagation());
+        modalMediaContainer.addEventListener('click', (e) => e.stopPropagation());
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeImageModal(); });
+
+        pinBtn.addEventListener('click', async () => {
+            const searchText = searchInput.value.trim();
+            if (searchText) {
+                const formattedTag = formatSearchText(searchText);
+                const isAlreadySaved = savedTags.some(t => t.tag === formattedTag);
+                if (isAlreadySaved) removeSavedTag(formattedTag);
+                else addSavedTag(formattedTag, formatTag(formattedTag));
+            }
+        });
+
+        searchToggleBtn.addEventListener('click', toggleSearchVisibility);
+        document.addEventListener('click', closeSearchOnClickOutside);
+
+        artToggle.addEventListener('change', function() {
+            if (this.checked) nsfwToggle.checked = false;
+            saveFilterStates();
+            startSearch(searchInput.value.trim() || currentTags);
+        });
+
+        nsfwToggle.addEventListener('change', function() {
+            if (this.checked) artToggle.checked = false;
+            saveFilterStates();
+            startSearch(searchInput.value.trim() || currentTags);
+        });
+
+        typeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                typeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTypeFilter = btn.dataset.type;
+                startSearch(searchInput.value.trim() || currentTags);
+            });
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                startSearch(searchInput.value.trim());
+                if (isSearchVisible) toggleSearchVisibility();
+            }
+        });
+
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                if (!isFetching && !endOfAllResults && isAutoLoadEnabled && isNearBottom()) loadMoreImages();
+            }, 200);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFilterStates();
+            loadSavedTags();
+            initParticles();
+            
+            // Cargar etiquetas populares
+            loadPopularTags();
+            
+            // Inicia buscando TODO lo reciente (string vacío)
+            startSearch('');
+        });
+    </script>
+</body>
+</html>
