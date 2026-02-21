@@ -901,7 +901,6 @@
             const limit = 10; 
             const tagsParam = finalTags ? `&tags=${encodeURIComponent(finalTags)}` : '';
             
-            // Eliminado el uso de proxy para solucionar problemas de carga
             const url = `${baseUrl}?page=dapi&s=post&q=index&json=1${tagsParam}&api_key=${apiKey}&user_id=${userId}&limit=${limit}&pid=${page}`;
             
             try {
@@ -1119,42 +1118,23 @@
                 skeleton.className = 'skeleton';
                 card.appendChild(skeleton);
 
-                let mediaEl;
-
-                if (isVideo) {
-                    // Cargar el video real, avanzar al segundo 1 y dejarlo pausado como "miniatura"
-                    mediaEl = document.createElement('video');
-                    mediaEl.className = 'image-result';
-                    mediaEl.muted = true;
-                    mediaEl.playsInline = true;
-                    mediaEl.src = fileUrl; 
-                    
-                    mediaEl.addEventListener('loadedmetadata', function() {
-                        this.currentTime = 1; // 1 segundo de reproducido
-                    });
-                    
-                    mediaEl.addEventListener('seeked', function() {
-                        skeleton.remove();
-                    });
-                    
-                    mediaEl.onerror = () => { card.style.display = 'none'; };
-                } else {
-                    let gridUrl = fixImageUrl(post.sample_url || post.preview_url || post.file_url);
-                    mediaEl = document.createElement('img');
-                    mediaEl.className = 'image-result';
-                    mediaEl.loading = 'lazy';
-                    mediaEl.src = gridUrl;
-                    
-                    mediaEl.onload = () => skeleton.remove();
-                    mediaEl.onerror = () => {
-                         const fallback = fixImageUrl(post.file_url);
-                         if (fallback && fallback !== gridUrl) {
-                             mediaEl.src = fallback;
-                             return;
-                         }
-                        card.style.display = 'none';
-                    };
-                }
+                // Siempre creamos una etiqueta <img> y usamos la miniatura (preview_url / sample_url)
+                let gridUrl = fixImageUrl(post.preview_url || post.sample_url || post.file_url);
+                let mediaEl = document.createElement('img');
+                mediaEl.className = 'image-result';
+                mediaEl.loading = 'lazy';
+                mediaEl.src = gridUrl;
+                
+                mediaEl.onload = () => skeleton.remove();
+                mediaEl.onerror = () => {
+                     // Si falla, intentamos cargar el original (file_url) a menos que sea un vídeo
+                     const fallback = fixImageUrl(post.file_url);
+                     if (fallback && fallback !== gridUrl && !isVideo) {
+                         mediaEl.src = fallback;
+                         return;
+                     }
+                    card.style.display = 'none';
+                };
                 
                 card.addEventListener('click', () => {
                     const imageData = {
