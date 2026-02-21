@@ -36,12 +36,6 @@
             -moz-osx-font-smoothing: grayscale;
         }
         
-        #particles {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-        }
-        
         .logo-bar {
             background-color: rgba(0, 0, 0, 0.95);
             width: 100%;
@@ -65,7 +59,6 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #777;
             width: 44px;
             height: 44px;
             display: flex;
@@ -79,13 +72,12 @@
         
         .search-toggle-btn:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: #ff4d4d;
         }
         
         .search-toggle-icon {
             width: 26px;
             height: 26px;
-            fill: currentColor;
+            object-fit: contain;
         }
         
         /* Panel de búsqueda flotante */
@@ -151,7 +143,8 @@
             position: absolute;
             left: 13px; top: 50%;
             transform: translateY(-50%);
-            width: 16px; fill: #777;
+            width: 18px; 
+            object-fit: contain;
             pointer-events: none;
         }
 
@@ -197,7 +190,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             width: 100%;
         }
 
@@ -223,6 +216,17 @@
 
         .type-btn:hover:not(.active) {
             background-color: #333;
+        }
+
+        /* TEXTO DE ETIQUETAS RECOMENDADAS */
+        .recommended-tags-text {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .search-options {
@@ -683,14 +687,10 @@
     </style>
 </head>
 <body>
-    <canvas id="particles"></canvas>
-    
     <div class="logo-bar">
         <img src="https://i.ibb.co/q3tZpy1K/Logo.png" alt="Logo" class="logo">
         <button class="search-toggle-btn" id="searchToggleBtn" title="Mostrar buscador">
-            <svg class="search-toggle-icon" viewBox="0 0 24 24">
-                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
+            <img src="https://i.ibb.co/n84F5wwC/lupa.png" alt="Buscar" class="search-toggle-icon">
         </button>
     </div>
     
@@ -698,9 +698,7 @@
         <div class="search-filters-content">
             <div class="search-box-container">
                 <div class="search-container">
-                    <svg class="search-icon" viewBox="0 0 24 24">
-                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 11.99 14 9.5 14z"/>
-                    </svg>
+                    <img src="https://i.ibb.co/n84F5wwC/lupa.png" alt="Buscar" class="search-icon">
                     <input type="text" class="search-box" id="searchInput" placeholder="Buscar (en inglés)...">
                     <button class="pin-btn" id="pinBtn" title="Fijar búsqueda">
                         <svg class="pin-icon" viewBox="0 0 24 24">
@@ -714,9 +712,13 @@
                     <button class="type-btn" data-type="image">Imágenes</button>
                     <button class="type-btn" data-type="video">Vídeos</button>
                 </div>
+                
+                <div class="recommended-tags-text">
+                    ETIQUETAS RECOMENDADAS: Más Reciente, Disney, Femboys, Furry,
+                </div>
 
                 <div class="search-options" id="searchOptions">
-                    </div>
+                </div>
             </div>
             
             <div class="filters-box-container">
@@ -787,10 +789,6 @@
     </div>
 
     <script>
-        // API GELBOORU
-        const GEL_API_KEY = '0d1c80b323399ab231cd442933527360d97c6fd54f57dc064cc26bada3ade9221f8579cf0a2f6cb265d553866d39b443f660ffae0a28d96c8fa6064ebb77ef72';
-        const GEL_USER_ID = '1895037';
-        
         // API RULE34
         const R34_API_KEY = '98292e068da149bb7d1a02f400727e06a5bc26e1d4e044b0b371e8eec454484606d1d25cd3c6192802f1a33b8b7e4cd1979930172f638e101e8131fe033d22b0';
         const R34_USER_ID = '5935306';
@@ -836,46 +834,40 @@
         let isAutoLoadEnabled = true;
         let currentTypeFilter = 'all'; 
 
-        // Función para cargar etiquetas populares al inicio
-        async function loadPopularTags() {
-            // Usamos Rule34 para obtener tendencias generales
-            const url = `https://api.rule34.xxx/index.php?page=dapi&s=tag&q=index&json=1&orderby=count&order=DESC&limit=10`;
+        // ARREGLO ETIQUETAS: Cargar botones con etiquetas predefinidas recomendadas
+        function loadPopularTags() {
+            searchOptions.innerHTML = '';
             
-            try {
-                const response = await fetch(proxy + encodeURIComponent(url));
-                if (response.ok) {
-                    const data = await response.json();
-                    if (Array.isArray(data)) {
-                        searchOptions.innerHTML = '';
-                        // Añadimos etiquetas guardadas primero si existen
-                        if (savedTags.length > 0) {
-                            renderSavedTags(); 
-                        }
-                        
-                        // Añadimos las populares
-                        data.forEach(tagData => {
-                            // Evitamos duplicados si ya están en guardados
-                            if (!savedTags.some(t => t.tag === tagData.name)) {
-                                const tagElement = document.createElement('div');
-                                tagElement.className = 'option';
-                                tagElement.textContent = formatTag(tagData.name);
-                                tagElement.dataset.tag = tagData.name;
-                                
-                                tagElement.addEventListener('click', () => {
-                                    searchInput.value = formatTag(tagData.name);
-                                    startSearch(tagData.name);
-                                    if (isSearchVisible) {
-                                        toggleSearchVisibility();
-                                    }
-                                });
-                                searchOptions.appendChild(tagElement);
-                            }
-                        });
-                    }
-                }
-            } catch (error) {
-                console.log("No se pudieron cargar etiquetas populares", error);
+            // Añadimos etiquetas guardadas primero si existen
+            if (savedTags.length > 0) {
+                renderSavedTags(); 
             }
+            
+            // Etiquetas recomendadas (Más Reciente = cadena vacía)
+            const recommendedTags = [
+                { name: '', display: 'Más Reciente' },
+                { name: 'disney', display: 'Disney' },
+                { name: 'femboy', display: 'Femboys' },
+                { name: 'furry', display: 'Furry' }
+            ];
+
+            recommendedTags.forEach(tagData => {
+                if (!savedTags.some(t => t.tag === tagData.name)) {
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'option';
+                    tagElement.textContent = tagData.display;
+                    tagElement.dataset.tag = tagData.name;
+                    
+                    tagElement.addEventListener('click', () => {
+                        searchInput.value = tagData.name !== '' ? tagData.display : '';
+                        startSearch(tagData.name);
+                        if (isSearchVisible) {
+                            toggleSearchVisibility();
+                        }
+                    });
+                    searchOptions.appendChild(tagElement);
+                }
+            });
         }
 
         function toggleSearchVisibility() {
@@ -897,19 +889,19 @@
         }
 
         function saveFilterStates() {
-            localStorage.setItem('gelbooru_nsfw_enabled', nsfwToggle.checked);
-            localStorage.setItem('gelbooru_art_enabled', artToggle.checked);
+            localStorage.setItem('noxesphare_nsfw_enabled', nsfwToggle.checked);
+            localStorage.setItem('noxesphare_art_enabled', artToggle.checked);
         }
 
         function loadFilterStates() {
-            const savedNsfwState = localStorage.getItem('gelbooru_nsfw_enabled');
-            const savedArtState = localStorage.getItem('gelbooru_art_enabled');
+            const savedNsfwState = localStorage.getItem('noxesphare_nsfw_enabled');
+            const savedArtState = localStorage.getItem('noxesphare_art_enabled');
             if (savedNsfwState !== null) nsfwToggle.checked = savedNsfwState === 'true';
             if (savedArtState !== null) artToggle.checked = savedArtState === 'true';
         }
 
         function loadSavedTags() {
-            const saved = localStorage.getItem('gelbooru_saved_tags');
+            const saved = localStorage.getItem('noxesphare_saved_tags');
             if (saved) {
                 savedTags = JSON.parse(saved);
                 renderSavedTags();
@@ -917,12 +909,10 @@
         }
 
         function saveTagsToStorage() {
-            localStorage.setItem('gelbooru_saved_tags', JSON.stringify(savedTags));
+            localStorage.setItem('noxesphare_saved_tags', JSON.stringify(savedTags));
         }
 
         function renderSavedTags() {
-            // La lógica de renderizado principal ocurre en loadPopularTags para mantener el orden.
-            // Si las etiquetas populares fallan, podemos renderizar solo las guardadas aquí si es necesario.
             if (searchOptions.innerHTML === '') {
                 savedTags.forEach(t => {
                     const tagElement = document.createElement('div');
@@ -978,8 +968,6 @@
         }
 
         function formatSearchText(text) {
-            // Reemplaza comas por espacios para permitir múltiples etiquetas
-            // Ejemplo: "animated, anime" -> "animated anime"
             return text.trim().toLowerCase().replace(/,/g, ' ');
         }
 
@@ -1026,14 +1014,11 @@
                 finalTags += ' rating:explicit';
             }
             
-            // LÓGICA DE FILTRADO POR TIPO
-            // Aquí corregimos para que agregue "animated" correctamente para buscar videos
+            // LÓGICA DE FILTRADO DE VIDEO ARREGLADA
             if (currentTypeFilter === 'image') {
-                finalTags += ' -animated';
+                finalTags += ' -video -animated';
             } else if (currentTypeFilter === 'video') {
-                // Añadimos 'animated' como etiqueta adicional, no con '+'
-                // Esto permite búsquedas como "anime animated"
-                finalTags = finalTags ? `${finalTags} animated` : 'animated';
+                finalTags = finalTags ? `${finalTags} video` : 'video';
             }
 
             const limit = 10; 
@@ -1050,10 +1035,6 @@
                 console.error("Error en fetch:", baseUrl, err);
                 return [];
             }
-        }
-
-        async function fetchGelbooruPosts() {
-            return await fetchBooruPosts('https://gelbooru.com/index.php', GEL_API_KEY, GEL_USER_ID, currentTags, currentPage);
         }
 
         async function fetchRule34Posts() {
@@ -1133,12 +1114,10 @@
             }
         }
 
-        // ABRIR MODAL CON SOPORTE DE VIDEO
         function openImageModal(imageData) {
             currentImageData = imageData;
             modalMediaContainer.innerHTML = '';
             
-            // Detectar video por extensión
             const ext = imageData.imgUrl.split('.').pop().split('?')[0].toLowerCase();
             const isVideo = ext === 'mp4' || ext === 'webm';
 
@@ -1149,8 +1128,8 @@
                 mediaElement.controls = true;
                 mediaElement.autoplay = true;
                 mediaElement.loop = true;
-                mediaElement.playsInline = true; // Importante para móviles
-                mediaElement.src = imageData.imgUrl; // URL completa del video
+                mediaElement.playsInline = true; 
+                mediaElement.src = imageData.imgUrl; 
             } else {
                 mediaElement = document.createElement('img');
                 mediaElement.className = 'modal-image';
@@ -1180,7 +1159,6 @@
             currentImageTags = [];
             isTranslating = false;
             
-            // Detener video
             const video = modalMediaContainer.querySelector('video');
             if (video) {
                 video.pause();
@@ -1204,12 +1182,9 @@
             noMoreResults.classList.remove('visible');
             currentPage++;
 
-            const [gelItems, r34Items] = await Promise.all([
-                fetchGelbooruPosts(),
-                fetchRule34Posts()
-            ]);
+            const r34Items = await fetchRule34Posts();
             
-            const combinedItems = [...gelItems, ...r34Items];
+            const combinedItems = [...r34Items];
             
             if (combinedItems.length > 0) {
                 allPosts = [...allPosts, ...combinedItems];
@@ -1232,12 +1207,11 @@
             return url;
         }
 
-        // CREAR TARJETA (CORREGIDO PARA VIDEOS)
+        // CARGA DE VÍDEOS ARREGLADA: Reproduce los vídeos en la cuadrícula de frente si es un mp4/webm.
         function createImageCard(post, index) {
             return new Promise((resolve) => {
                 if (!post) { resolve(); return; }
                 
-                // URL Original del archivo (para detectar si es video y para el modal)
                 const fileUrl = fixImageUrl(post.file_url);
                 if (!fileUrl) { resolve(); return; }
 
@@ -1245,29 +1219,15 @@
                 const isVideo = ext === 'mp4' || ext === 'webm';
                 const isGif = ext === 'gif';
 
-                // URL para mostrar en la cuadrícula (thumbnail/preview)
-                // Si es video MP4/WEBM, FORZAMOS usar preview_url o sample_url, NUNCA el file_url en <img>
-                let gridUrl;
-                if (isVideo) {
-                    gridUrl = fixImageUrl(post.preview_url || post.sample_url);
-                } else {
-                    // Si es imagen, intentamos sample primero, luego file
-                    gridUrl = fixImageUrl(post.sample_url || post.file_url || post.preview_url);
-                }
-
-                if (!gridUrl) { resolve(); return; }
-
                 const card = document.createElement('div');
                 card.className = 'image-card';
                 card.style.animationDelay = `${index * 0.05}s`;
                 
-                // ETIQUETA
                 const badge = document.createElement('div');
                 badge.className = 'type-badge';
                 if (isVideo || isGif) {
                     badge.classList.add('video-badge');
                     badge.textContent = 'VÍDEO';
-                    // Mostrar badge si es video
                     if (currentTypeFilter === 'all' || currentTypeFilter === 'video') {
                         card.appendChild(badge);
                     }
@@ -1281,35 +1241,48 @@
                 const skeleton = document.createElement('div');
                 skeleton.className = 'skeleton';
                 card.appendChild(skeleton);
-                
-                const img = document.createElement('img');
-                img.className = 'image-result';
-                img.loading = 'lazy';
-                
-                img.onload = () => skeleton.remove();
-                img.onerror = () => {
-                    // Fallback solo si no era video (si falla el preview de video, ocultamos)
-                    if (!isVideo) {
+
+                let mediaEl;
+
+                if (isVideo) {
+                    // Cargar el vídeo directamente silenciado para evitar errores de thumbnail.
+                    mediaEl = document.createElement('video');
+                    mediaEl.className = 'image-result';
+                    mediaEl.src = fileUrl;
+                    mediaEl.muted = true;
+                    mediaEl.autoplay = true;
+                    mediaEl.loop = true;
+                    mediaEl.playsInline = true;
+                    
+                    mediaEl.onloadeddata = () => skeleton.remove();
+                    mediaEl.onerror = () => { card.style.display = 'none'; };
+                } else {
+                    let gridUrl = fixImageUrl(post.sample_url || post.file_url || post.preview_url);
+                    mediaEl = document.createElement('img');
+                    mediaEl.className = 'image-result';
+                    mediaEl.loading = 'lazy';
+                    mediaEl.src = gridUrl;
+                    
+                    mediaEl.onload = () => skeleton.remove();
+                    mediaEl.onerror = () => {
                          const fallback = fixImageUrl(post.file_url);
                          if (fallback && fallback !== gridUrl) {
-                             img.src = fallback;
+                             mediaEl.src = fallback;
                              return;
                          }
-                    }
-                    card.style.display = 'none';
-                };
-                
-                img.src = gridUrl;
+                        card.style.display = 'none';
+                    };
+                }
                 
                 card.addEventListener('click', () => {
                     const imageData = {
-                        imgUrl: fileUrl, // Al abrir modal, usamos el VIDEO/IMAGEN real
+                        imgUrl: fileUrl, 
                         tags: post.tags || ''
                     };
                     openImageModal(imageData);
                 });
                 
-                card.appendChild(img);
+                card.appendChild(mediaEl);
                 resultsContainer.appendChild(card);
                 resolve();
             });
@@ -1343,12 +1316,8 @@
                 updatePinButtonState(currentTags);
             }
 
-            const [gelItems, r34Items] = await Promise.all([
-                fetchGelbooruPosts(),
-                fetchRule34Posts()
-            ]);
-            
-            const combinedItems = [...gelItems, ...r34Items];
+            const r34Items = await fetchRule34Posts();
+            const combinedItems = [...r34Items];
             
             if (combinedItems.length > 0 && activeSearchId === searchId) {
                 allPosts = [...allPosts, ...combinedItems];
@@ -1365,36 +1334,6 @@
 
             scrollLoading.style.display = 'none';
             isFetching = false;
-        }
-
-        function initParticles() {
-            const canvas = document.getElementById('particles');
-            const ctx = canvas.getContext('2d');
-            let w, h, squares = [];
-            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
-            window.addEventListener('resize', resize);
-            resize();
-            for(let i = 0; i < 70; i++) {
-                squares.push({
-                    x: Math.random() * w, y: Math.random() * h,
-                    size: Math.random() * 8 + 4,
-                    speed: Math.random() * 0.3 + 0.1,
-                    color: Math.random() > 0.5 ? '#0a0a0a' : '#050505',
-                    opacity: Math.random() * 0.4 + 0.2
-                });
-            }
-            function animate() {
-                ctx.clearRect(0, 0, w, h);
-                squares.forEach(s => {
-                    ctx.globalAlpha = s.opacity;
-                    ctx.fillStyle = s.color;
-                    ctx.fillRect(s.x, s.y, s.size, s.size);
-                    s.y -= s.speed;
-                    if(s.y < -20) { s.y = h + 20; s.x = Math.random() * w; }
-                });
-                requestAnimationFrame(animate);
-            }
-            animate();
         }
 
         // Event Listeners
@@ -1456,7 +1395,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadFilterStates();
             loadSavedTags();
-            initParticles();
             
             // Cargar etiquetas populares
             loadPopularTags();
