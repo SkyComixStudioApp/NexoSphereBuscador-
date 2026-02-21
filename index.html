@@ -223,10 +223,12 @@
             font-size: 11px;
             color: #888;
             margin-bottom: 10px;
-            text-align: center;
+            text-align: left;
             font-weight: bold;
             letter-spacing: 0.5px;
             text-transform: uppercase;
+            border-left: 3px solid #ff4d4d;
+            padding-left: 8px;
         }
 
         .search-options {
@@ -272,7 +274,6 @@
             font-size: 12px; 
             color: #aaa; 
             font-weight: bold;
-            text-transform: uppercase; 
             letter-spacing: 0.8px;
             display: flex;
             align-items: center;
@@ -714,7 +715,7 @@
                 </div>
                 
                 <div class="recommended-tags-text">
-                    ETIQUETAS RECOMENDADAS: Más Reciente, Disney, Femboys, Furry,
+                    ETIQUETAS RECOMENDADAS
                 </div>
 
                 <div class="search-options" id="searchOptions">
@@ -725,7 +726,7 @@
                 <div class="filter-row">
                     <span class="filter-label">
                         <span class="icon">🎨</span>
-                        SOLO MOSTRAR ARTE
+                        Solo mostrar arte
                     </span>
                     <label class="switch art-switch">
                         <input type="checkbox" id="artToggle">
@@ -738,7 +739,7 @@
                 <div class="filter-row">
                     <span class="filter-label">
                         <span class="icon">🔞</span>
-                        SOLO MOSTRAR +18
+                        Solo mostrar +18
                     </span>
                     <label class="switch">
                         <input type="checkbox" id="nsfwToggle">
@@ -1014,7 +1015,6 @@
                 finalTags += ' rating:explicit';
             }
             
-            // LÓGICA DE FILTRADO DE VIDEO ARREGLADA
             if (currentTypeFilter === 'image') {
                 finalTags += ' -video -animated';
             } else if (currentTypeFilter === 'video') {
@@ -1080,7 +1080,7 @@
                 tagElement.textContent = tagData.display;
                 tagElement.dataset.tag = tagData.original;
                 tagElement.addEventListener('click', () => {
-                    closeImageModal();
+                        closeImageModal();
                     searchInput.value = formatTag(tagData.original);
                     startSearch(tagData.original);
                     if (isSearchVisible) toggleSearchVisibility();
@@ -1207,7 +1207,6 @@
             return url;
         }
 
-        // CARGA DE VÍDEOS ARREGLADA: Reproduce los vídeos en la cuadrícula de frente si es un mp4/webm.
         function createImageCard(post, index) {
             return new Promise((resolve) => {
                 if (!post) { resolve(); return; }
@@ -1244,35 +1243,30 @@
 
                 let mediaEl;
 
+                // Modificación: Solo cargar miniaturas en la cuadrícula
+                let gridUrl;
                 if (isVideo) {
-                    // Cargar el vídeo directamente silenciado para evitar errores de thumbnail.
-                    mediaEl = document.createElement('video');
-                    mediaEl.className = 'image-result';
-                    mediaEl.src = fileUrl;
-                    mediaEl.muted = true;
-                    mediaEl.autoplay = true;
-                    mediaEl.loop = true;
-                    mediaEl.playsInline = true;
-                    
-                    mediaEl.onloadeddata = () => skeleton.remove();
-                    mediaEl.onerror = () => { card.style.display = 'none'; };
+                    // Si es un video, obligamos a que se renderice la imagen de miniatura
+                    gridUrl = fixImageUrl(post.preview_url || post.sample_url);
                 } else {
-                    let gridUrl = fixImageUrl(post.sample_url || post.file_url || post.preview_url);
-                    mediaEl = document.createElement('img');
-                    mediaEl.className = 'image-result';
-                    mediaEl.loading = 'lazy';
-                    mediaEl.src = gridUrl;
-                    
-                    mediaEl.onload = () => skeleton.remove();
-                    mediaEl.onerror = () => {
-                         const fallback = fixImageUrl(post.file_url);
-                         if (fallback && fallback !== gridUrl) {
-                             mediaEl.src = fallback;
-                             return;
-                         }
-                        card.style.display = 'none';
-                    };
+                    gridUrl = fixImageUrl(post.sample_url || post.preview_url || post.file_url);
                 }
+
+                mediaEl = document.createElement('img');
+                mediaEl.className = 'image-result';
+                mediaEl.loading = 'lazy';
+                mediaEl.src = gridUrl;
+                
+                mediaEl.onload = () => skeleton.remove();
+                mediaEl.onerror = () => {
+                     const fallback = fixImageUrl(post.file_url);
+                     // Solamente permitimos retroceder a file_url si no es un archivo de video
+                     if (!isVideo && fallback && fallback !== gridUrl) {
+                         mediaEl.src = fallback;
+                         return;
+                     }
+                    card.style.display = 'none';
+                };
                 
                 card.addEventListener('click', () => {
                     const imageData = {
