@@ -254,82 +254,6 @@
             background-color: #333;
             transform: translateY(-1px);
         }
-
-        /* Recuadro filtros */
-        .filters-box-container {
-            background-color: rgba(5, 5, 5, 0.95);
-            border-radius: 10px;
-            padding: 12px 15px;
-            border: 1px solid #222;
-        }
-
-        .filter-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-        }
-
-        .filter-label { 
-            font-size: 12px; 
-            color: #aaa; 
-            font-weight: bold;
-            letter-spacing: 0.8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .filter-label .icon {
-            font-size: 14px;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 42px;
-            height: 20px;
-        }
-
-        .switch input { 
-            opacity: 0; 
-            width: 0; 
-            height: 0; 
-            outline: none !important;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #222;
-            transition: .4s;
-            border-radius: 22px;
-            border: 1px solid #333;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px; width: 14px;
-            left: 3px; bottom: 2px;
-            background-color: #aaa;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider { background-color: #ff4d4d; }
-        input:checked + .slider:before { transform: translateX(20px); }
-        
-        .art-switch input:checked + .slider { background-color: #4CAF50; }
-        .art-switch input:checked + .slider:before { transform: translateX(20px); }
-        
-        .filter-divider {
-            width: 100%;
-            height: 1px;
-            background-color: #333;
-            margin: 8px 0;
-        }
         
         /* CUADRÍCULA */
         .results-wrapper {
@@ -721,32 +645,6 @@
                 <div class="search-options" id="searchOptions">
                 </div>
             </div>
-            
-            <div class="filters-box-container">
-                <div class="filter-row">
-                    <span class="filter-label">
-                        <span class="icon">🎨</span>
-                        Solo mostrar arte
-                    </span>
-                    <label class="switch art-switch">
-                        <input type="checkbox" id="artToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                
-                <div class="filter-divider"></div>
-                
-                <div class="filter-row">
-                    <span class="filter-label">
-                        <span class="icon">🔞</span>
-                        Solo mostrar +18
-                    </span>
-                    <label class="switch">
-                        <input type="checkbox" id="nsfwToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
         </div>
     </div>
     
@@ -794,13 +692,10 @@
         const R34_API_KEY = '98292e068da149bb7d1a02f400727e06a5bc26e1d4e044b0b371e8eec454484606d1d25cd3c6192802f1a33b8b7e4cd1979930172f638e101e8131fe033d22b0';
         const R34_USER_ID = '5935306';
 
-        const proxy = "https://api.codetabs.com/v1/proxy?quest=";
         const TRANSLATE_API = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=";
         
         const searchInput = document.getElementById('searchInput');
         const resultsContainer = document.getElementById('resultsContainer');
-        const nsfwToggle = document.getElementById('nsfwToggle');
-        const artToggle = document.getElementById('artToggle');
         const scrollLoading = document.getElementById('scrollLoading');
         const loadMoreIndicator = document.getElementById('loadMoreIndicator');
         const imageModal = document.getElementById('imageModal');
@@ -887,18 +782,6 @@
                 !searchToggleBtn.contains(event.target)) {
                 toggleSearchVisibility();
             }
-        }
-
-        function saveFilterStates() {
-            localStorage.setItem('noxesphare_nsfw_enabled', nsfwToggle.checked);
-            localStorage.setItem('noxesphare_art_enabled', artToggle.checked);
-        }
-
-        function loadFilterStates() {
-            const savedNsfwState = localStorage.getItem('noxesphare_nsfw_enabled');
-            const savedArtState = localStorage.getItem('noxesphare_art_enabled');
-            if (savedNsfwState !== null) nsfwToggle.checked = savedNsfwState === 'true';
-            if (savedArtState !== null) artToggle.checked = savedArtState === 'true';
         }
 
         function loadSavedTags() {
@@ -1009,12 +892,6 @@
         async function fetchBooruPosts(baseUrl, apiKey, userId, tags, page) {
             let finalTags = tags ? tags.trim() : '';
             
-            if (artToggle.checked) {
-                finalTags += ' rating:general';
-            } else if (nsfwToggle.checked) {
-                finalTags += ' rating:explicit';
-            }
-            
             if (currentTypeFilter === 'image') {
                 finalTags += ' -video -animated';
             } else if (currentTypeFilter === 'video') {
@@ -1024,10 +901,11 @@
             const limit = 10; 
             const tagsParam = finalTags ? `&tags=${encodeURIComponent(finalTags)}` : '';
             
+            // Eliminado el uso de proxy para solucionar problemas de carga
             const url = `${baseUrl}?page=dapi&s=post&q=index&json=1${tagsParam}&api_key=${apiKey}&user_id=${userId}&limit=${limit}&pid=${page}`;
             
             try {
-                const response = await fetch(proxy + encodeURIComponent(url));
+                const response = await fetch(url);
                 if (!response.ok) return [];
                 const data = await response.json();
                 return data.post || (Array.isArray(data) ? data : []);
@@ -1243,30 +1121,40 @@
 
                 let mediaEl;
 
-                // Modificación: Solo cargar miniaturas en la cuadrícula
-                let gridUrl;
                 if (isVideo) {
-                    // Si es un video, obligamos a que se renderice la imagen de miniatura
-                    gridUrl = fixImageUrl(post.preview_url || post.sample_url);
+                    // Cargar el video real, avanzar al segundo 1 y dejarlo pausado como "miniatura"
+                    mediaEl = document.createElement('video');
+                    mediaEl.className = 'image-result';
+                    mediaEl.muted = true;
+                    mediaEl.playsInline = true;
+                    mediaEl.src = fileUrl; 
+                    
+                    mediaEl.addEventListener('loadedmetadata', function() {
+                        this.currentTime = 1; // 1 segundo de reproducido
+                    });
+                    
+                    mediaEl.addEventListener('seeked', function() {
+                        skeleton.remove();
+                    });
+                    
+                    mediaEl.onerror = () => { card.style.display = 'none'; };
                 } else {
-                    gridUrl = fixImageUrl(post.sample_url || post.preview_url || post.file_url);
+                    let gridUrl = fixImageUrl(post.sample_url || post.preview_url || post.file_url);
+                    mediaEl = document.createElement('img');
+                    mediaEl.className = 'image-result';
+                    mediaEl.loading = 'lazy';
+                    mediaEl.src = gridUrl;
+                    
+                    mediaEl.onload = () => skeleton.remove();
+                    mediaEl.onerror = () => {
+                         const fallback = fixImageUrl(post.file_url);
+                         if (fallback && fallback !== gridUrl) {
+                             mediaEl.src = fallback;
+                             return;
+                         }
+                        card.style.display = 'none';
+                    };
                 }
-
-                mediaEl = document.createElement('img');
-                mediaEl.className = 'image-result';
-                mediaEl.loading = 'lazy';
-                mediaEl.src = gridUrl;
-                
-                mediaEl.onload = () => skeleton.remove();
-                mediaEl.onerror = () => {
-                     const fallback = fixImageUrl(post.file_url);
-                     // Solamente permitimos retroceder a file_url si no es un archivo de video
-                     if (!isVideo && fallback && fallback !== gridUrl) {
-                         mediaEl.src = fallback;
-                         return;
-                     }
-                    card.style.display = 'none';
-                };
                 
                 card.addEventListener('click', () => {
                     const imageData = {
@@ -1350,18 +1238,6 @@
         searchToggleBtn.addEventListener('click', toggleSearchVisibility);
         document.addEventListener('click', closeSearchOnClickOutside);
 
-        artToggle.addEventListener('change', function() {
-            if (this.checked) nsfwToggle.checked = false;
-            saveFilterStates();
-            startSearch(searchInput.value.trim() || currentTags);
-        });
-
-        nsfwToggle.addEventListener('change', function() {
-            if (this.checked) artToggle.checked = false;
-            saveFilterStates();
-            startSearch(searchInput.value.trim() || currentTags);
-        });
-
         typeButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 typeButtons.forEach(b => b.classList.remove('active'));
@@ -1387,7 +1263,6 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            loadFilterStates();
             loadSavedTags();
             
             // Cargar etiquetas populares
