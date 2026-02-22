@@ -185,11 +185,11 @@
             fill: currentColor;
         }
 
-        /* BOTONES DE TIPO (TODO, IMAGENES, VIDEOS) */
+        /* BOTONES DE TIPO (TODO, IMAGENES, VIDEOS) - Espaciado reducido a 5px */
         .type-filters {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 5px; 
             margin-bottom: 10px;
             width: 100%;
         }
@@ -410,7 +410,7 @@
             transform: rotate(180deg);
         }
 
-        /* ETIQUETAS */
+        /* ETIQUETAS Y RECUADRO */
         .tags-section {
             width: 100%;
             max-width: 800px;
@@ -447,13 +447,61 @@
             font-size: 11px;
         }
 
+        /* Nuevo Recuadro de Etiquetas Integrado */
+        .tags-box {
+            background-color: #0f0f0f;
+            border: 1px solid #222;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Evita que el botón rompa las esquinas del recuadro */
+        }
+
+        .tags-list-container {
+            padding: 12px;
+        }
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 65px; /* Altura para aprox. 2 filas de etiquetas */
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out;
+        }
+
+        .tags-list.expanded {
+            max-height: 1500px; /* Suficiente para expandir todas */
+        }
+
+        /* Botón como barra inferior */
+        .show-more-tags-btn {
+            background-color: #161616;
+            color: #4a90e2;
+            border: none;
+            border-top: 1px solid #222;
+            padding: 12px;
+            width: 100%;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none; /* Se oculta por defecto si hay pocas etiquetas */
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+
+        .show-more-tags-btn:hover {
+            background-color: #222;
+        }
+
         .translation-status {
             width: 100%;
-            padding: 15px;
+            padding: 10px;
             text-align: center;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-bottom: 15px;
-            font-size: 14px;
+            font-size: 13px;
             display: none;
             border: 1px solid transparent;
             outline: none !important;
@@ -473,14 +521,6 @@
             border-color: #00ff00;
             color: #00ff00;
             display: block;
-        }
-
-        .tags-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 0 2px;
-            min-height: 60px;
         }
 
         .modal-tag {
@@ -507,6 +547,45 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
         }
 
+        /* SECCIÓN IMÁGENES RELACIONADAS */
+        .related-images-section {
+            width: 100%;
+            max-width: 1000px;
+            margin: 30px auto 20px;
+            padding: 0 5px;
+        }
+
+        .related-header {
+            font-size: 14px;
+            color: #aaa;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px;
+        }
+
+        .related-loading-indicator {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 15px;
+            color: #4a90e2;
+            font-size: 13px;
+            display: none;
+        }
+        .related-loading-indicator.active {
+            display: block;
+        }
+
+        /* CARGA Y ESTADOS */
         #scrollLoading {
             text-align: center;
             padding: 20px;
@@ -559,55 +638,29 @@
         }
 
         @media (min-width: 768px) {
-            .results-wrapper {
-                grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-                gap: 16px;
-                padding: 20px 25px;
-            }
+            .results-wrapper { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; padding: 20px 25px; }
+            .related-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
         }
 
         @media (min-width: 1024px) {
-            .results-wrapper {
-                grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-                gap: 20px;
-            }
+            .results-wrapper { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px; }
             .logo { height: 42px; }
             .logo-bar { padding: 12px 25px; }
-            .modal-tag {
-                font-size: 13px;
-                padding: 7px 16px;
-                max-width: 260px;
-            }
-            .tags-section {
-                max-width: 1000px;
-            }
+            .modal-tag { font-size: 13px; padding: 7px 16px; max-width: 260px; }
+            .tags-section, .related-images-section { max-width: 1000px; }
         }
 
         @media (min-width: 1440px) {
-            .results-wrapper {
-                grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-                gap: 24px;
-            }
-            .search-filters-panel.visible {
-                max-height: 600px;
-            }
-            .search-box {
-                font-size: 16px;
-                padding: 12px 18px 12px 45px;
-            }
+            .results-wrapper { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 24px; }
+            .search-filters-panel.visible { max-height: 600px; }
+            .search-box { font-size: 16px; padding: 12px 18px 12px 45px; }
             .search-icon { width: 18px; left: 15px; }
             .pin-btn { right: 15px; }
-            .option {
-                padding: 8px 18px;
-                font-size: 13px;
-            }
+            .option { padding: 8px 18px; font-size: 13px; }
         }
 
         @media (min-width: 1800px) {
-            .results-wrapper {
-                grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-                gap: 28px;
-            }
+            .results-wrapper { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 28px; }
         }
     </style>
 </head>
@@ -669,14 +722,26 @@
                 
                 <div class="translation-status" id="translatingStatus">
                     <span class="translating-indicator"></span>
-                    Traduciendo etiquetas al español...
+                    Traduciendo etiquetas...
                 </div>
                 <div class="translation-status" id="translatedStatus">
-                    ✓ Etiquetas traducidas al español
+                    ✓ Etiquetas traducidas
                 </div>
                 
-                <div class="tags-list" id="tagsList">
+                <div class="tags-box">
+                    <div class="tags-list-container">
+                        <div class="tags-list" id="tagsList"></div>
                     </div>
+                    <button class="show-more-tags-btn" id="showMoreTagsBtn">Ver más etiquetas</button>
+                </div>
+            </div>
+
+            <div class="related-images-section" id="relatedImagesSection">
+                <div class="related-header">
+                    <span>🔗 Imágenes Relacionadas</span>
+                </div>
+                <div class="related-grid" id="relatedImagesGrid"></div>
+                <div class="related-loading-indicator" id="relatedLoadingIndicator">Cargando más relacionados...</div>
             </div>
         </div>
         
@@ -711,6 +776,9 @@
         const translatedStatus = document.getElementById('translatedStatus');
         const noMoreResults = document.getElementById('noMoreResults');
         const typeButtons = document.querySelectorAll('.type-btn');
+        const showMoreTagsBtn = document.getElementById('showMoreTagsBtn');
+        const relatedImagesGrid = document.getElementById('relatedImagesGrid');
+        const relatedLoadingIndicator = document.getElementById('relatedLoadingIndicator');
         
         let currentPage = 0;
         let currentTags = '';
@@ -719,27 +787,25 @@
         let currentImageData = null;
         let allPosts = [];
         let savedTags = [];
-        let autoLoadTimer = null;
         let isLoadingMore = false;
         let isSearchVisible = false;
         let currentImageTags = [];
         let isTranslating = false;
         let activeSearchId = null;
-        let isProcessingImage = false;
-        let imageQueue = [];
         let isAutoLoadEnabled = true;
         let currentTypeFilter = 'all'; 
+
+        // Variables para relacionados
+        let relatedCurrentPage = 0;
+        let isFetchingRelated = false;
+        let endOfRelatedResults = false;
+        let currentRelatedSearchTags = '';
 
         // ARREGLO ETIQUETAS: Cargar botones con etiquetas predefinidas recomendadas
         function loadPopularTags() {
             searchOptions.innerHTML = '';
+            if (savedTags.length > 0) renderSavedTags(); 
             
-            // Añadimos etiquetas guardadas primero si existen
-            if (savedTags.length > 0) {
-                renderSavedTags(); 
-            }
-            
-            // Etiquetas recomendadas (Más Reciente = cadena vacía)
             const recommendedTags = [
                 { name: '', display: 'Más Reciente' },
                 { name: 'disney', display: 'Disney' },
@@ -753,13 +819,10 @@
                     tagElement.className = 'option';
                     tagElement.textContent = tagData.display;
                     tagElement.dataset.tag = tagData.name;
-                    
                     tagElement.addEventListener('click', () => {
                         searchInput.value = tagData.name !== '' ? tagData.display : '';
                         startSearch(tagData.name);
-                        if (isSearchVisible) {
-                            toggleSearchVisibility();
-                        }
+                        if (isSearchVisible) toggleSearchVisibility();
                     });
                     searchOptions.appendChild(tagElement);
                 }
@@ -817,8 +880,6 @@
             if (!savedTags.some(t => t.tag === tag)) {
                 savedTags.push({ tag, display });
                 saveTagsToStorage();
-                
-                // Crear elemento visual
                 const tagElement = document.createElement('div');
                 tagElement.className = 'option';
                 tagElement.textContent = display;
@@ -828,8 +889,6 @@
                     startSearch(tag);
                     if (isSearchVisible) toggleSearchVisibility();
                 });
-                
-                // Insertar al principio
                 searchOptions.insertBefore(tagElement, searchOptions.firstChild);
                 updatePinButtonState(tag);
             }
@@ -838,11 +897,8 @@
         function removeSavedTag(tag) {
             savedTags = savedTags.filter(t => t.tag !== tag);
             saveTagsToStorage();
-            
-            // Eliminar elemento visual
             const existing = searchOptions.querySelector(`.option[data-tag="${tag}"]`);
             if (existing) existing.remove();
-            
             updatePinButtonState('');
         }
 
@@ -889,7 +945,7 @@
             return translatedTags;
         }
 
-        async function fetchBooruPosts(baseUrl, apiKey, userId, tags, page) {
+        async function fetchBooruPosts(baseUrl, apiKey, userId, tags, page, customLimit = 10) {
             let finalTags = tags ? tags.trim() : '';
             
             if (currentTypeFilter === 'image') {
@@ -898,10 +954,8 @@
                 finalTags = finalTags ? `${finalTags} video` : 'video';
             }
 
-            const limit = 10; 
             const tagsParam = finalTags ? `&tags=${encodeURIComponent(finalTags)}` : '';
-            
-            const url = `${baseUrl}?page=dapi&s=post&q=index&json=1${tagsParam}&api_key=${apiKey}&user_id=${userId}&limit=${limit}&pid=${page}`;
+            const url = `${baseUrl}?page=dapi&s=post&q=index&json=1${tagsParam}&api_key=${apiKey}&user_id=${userId}&limit=${customLimit}&pid=${page}`;
             
             try {
                 const response = await fetch(url);
@@ -915,23 +969,135 @@
         }
 
         async function fetchRule34Posts() {
-            return await fetchBooruPosts('https://api.rule34.xxx/index.php', R34_API_KEY, R34_USER_ID, currentTags, currentPage);
+            return await fetchBooruPosts('https://api.rule34.xxx/index.php', R34_API_KEY, R34_USER_ID, currentTags, currentPage, 10);
+        }
+
+        // FUNCIÓN PARA BUSCAR IMÁGENES RELACIONADAS EN EL MODAL (Ahora escoge tags aleatorios e inicializa scroll)
+        async function loadRelatedImages(tagsString) {
+            relatedImagesGrid.innerHTML = '';
+            relatedCurrentPage = 0;
+            isFetchingRelated = false;
+            endOfRelatedResults = false;
+            currentRelatedSearchTags = '';
+
+            if (!tagsString) {
+                relatedImagesGrid.innerHTML = '<div style="color:#aaa; text-align:center; grid-column:1/-1; padding: 15px;">No hay datos para relacionar.</div>';
+                return;
+            }
+
+            // Filtramos etiquetas que no sirven para buscar relacionados
+            const arr = tagsString.split(' ').filter(t => t.trim() !== '' && t !== 'video' && t !== 'animated' && t !== 'sound');
+            
+            if(arr.length === 0) {
+                relatedImagesGrid.innerHTML = '<div style="color:#aaa; text-align:center; grid-column:1/-1; padding: 15px;">No hay etiquetas útiles para relacionar.</div>';
+                return;
+            }
+
+            // Mezclamos (shuffle) el array para que agarre etiquetas aleatorias de la imagen
+            const shuffled = arr.sort(() => 0.5 - Math.random());
+            // Seleccionamos hasta 2 etiquetas aleatorias
+            currentRelatedSearchTags = shuffled.slice(0, Math.min(2, shuffled.length)).join(' ');
+
+            await fetchAndAppendRelatedImages();
+        }
+
+        // NUEVA FUNCIÓN: Agregar imágenes relacionadas para el scroll infinito
+        async function fetchAndAppendRelatedImages() {
+            if (isFetchingRelated || endOfRelatedResults || !currentRelatedSearchTags) return;
+            
+            isFetchingRelated = true;
+            relatedLoadingIndicator.classList.add('active');
+
+            const relatedPosts = await fetchBooruPosts('https://api.rule34.xxx/index.php', R34_API_KEY, R34_USER_ID, currentRelatedSearchTags, relatedCurrentPage, 12);
+            
+            relatedLoadingIndicator.classList.remove('active');
+
+            if (relatedPosts.length === 0) {
+                endOfRelatedResults = true;
+                if (relatedCurrentPage === 0) {
+                    relatedImagesGrid.innerHTML = '<div style="color:#aaa; text-align:center; grid-column:1/-1; padding: 15px;">No se encontraron relacionados.</div>';
+                }
+            } else {
+                relatedPosts.forEach((post, index) => {
+                    const fileUrl = fixImageUrl(post.file_url);
+                    if (!fileUrl) return;
+
+                    const ext = fileUrl.split('.').pop().split('?')[0].toLowerCase();
+                    const isVideo = ext === 'mp4' || ext === 'webm';
+                    const isGif = ext === 'gif';
+
+                    const card = document.createElement('div');
+                    card.className = 'image-card';
+                    card.style.animationDelay = `${index * 0.05}s`;
+                    card.style.opacity = '0';
+                    card.style.animation = 'fadeInUp 0.5s forwards';
+
+                    if (isVideo || isGif) {
+                        const badge = document.createElement('div');
+                        badge.className = 'type-badge video-badge';
+                        badge.textContent = 'VÍDEO';
+                        card.appendChild(badge);
+                    }
+
+                    let gridUrl = fixImageUrl(post.preview_url || post.sample_url || post.file_url);
+                    let mediaEl = document.createElement('img');
+                    mediaEl.className = 'image-result';
+                    mediaEl.loading = 'lazy';
+                    mediaEl.src = gridUrl;
+                    
+                    mediaEl.onerror = () => { card.style.display = 'none'; };
+                    
+                    card.addEventListener('click', () => {
+                        const imageData = { imgUrl: fileUrl, tags: post.tags || '' };
+                        openImageModal(imageData); // Carga la nueva imagen en el modal
+                    });
+                    
+                    card.appendChild(mediaEl);
+                    relatedImagesGrid.appendChild(card);
+                });
+                relatedCurrentPage++;
+            }
+            isFetchingRelated = false;
         }
 
         function formatTag(tag) {
             return tag.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         }
 
+        function toggleTagsExpanded() {
+            tagsList.classList.toggle('expanded');
+            if (tagsList.classList.contains('expanded')) {
+                showMoreTagsBtn.textContent = 'Ocultar etiquetas';
+            } else {
+                showMoreTagsBtn.textContent = 'Ver más etiquetas';
+            }
+        }
+
+        function checkTagsOverflow(count) {
+            // Asumimos que más de 8-10 etiquetas ya desbordan el cuadro pequeño visualmente
+            if (count > 8) {
+                showMoreTagsBtn.style.display = 'block';
+            } else {
+                showMoreTagsBtn.style.display = 'none';
+            }
+        }
+
         function displayTags(tagsString) {
             tagsList.innerHTML = '';
+            tagsList.classList.remove('expanded');
+            showMoreTagsBtn.textContent = 'Ver más etiquetas';
+
             if (!tagsString) {
                 tagsList.innerHTML = '<div class="modal-tag">No hay etiquetas disponibles</div>';
                 tagsCount.textContent = '0';
+                showMoreTagsBtn.style.display = 'none';
                 return;
             }
+
             const tagsArray = tagsString.split(' ');
             tagsCount.textContent = tagsArray.length;
             currentImageTags = tagsArray;
+
             tagsArray.forEach(tag => {
                 if (tag.trim()) {
                     const tagElement = document.createElement('div');
@@ -947,6 +1113,8 @@
                     tagsList.appendChild(tagElement);
                 }
             });
+
+            checkTagsOverflow(tagsArray.length);
         }
 
         function displayTranslatedTags(translatedTags) {
@@ -957,7 +1125,7 @@
                 tagElement.textContent = tagData.display;
                 tagElement.dataset.tag = tagData.original;
                 tagElement.addEventListener('click', () => {
-                        closeImageModal();
+                    closeImageModal();
                     searchInput.value = formatTag(tagData.original);
                     startSearch(tagData.original);
                     if (isSearchVisible) toggleSearchVisibility();
@@ -995,6 +1163,13 @@
             currentImageData = imageData;
             modalMediaContainer.innerHTML = '';
             
+            // --- NUEVO: Control de historial (Para que el botón de retroceso cierre el modal) ---
+            // Solo creamos un estado nuevo si el modal estaba cerrado, para evitar problemas al saltar entre imágenes relacionadas
+            if (imageModal.style.display !== 'block') {
+                history.pushState({ modalOpen: true }, "");
+            }
+            // ----------------------------------------------------------------------------------
+
             const ext = imageData.imgUrl.split('.').pop().split('?')[0].toLowerCase();
             const isVideo = ext === 'mp4' || ext === 'webm';
 
@@ -1022,14 +1197,19 @@
             
             if (imageData.tags) {
                 displayTags(imageData.tags);
+                loadRelatedImages(imageData.tags); // Inicia la carga de relacionados aleatorios
                 setTimeout(() => startAutoTranslation(), 500);
             } else {
                 displayTags('');
+                loadRelatedImages('');
             }
-            imageModal.scrollTop = 0;
+            
+            imageModal.scrollTop = 0; // Subir al inicio al abrir/cambiar
         }
 
-        function closeImageModal() {
+        function closeImageModal(fromHistory = false) {
+            if (imageModal.style.display !== 'block') return; // Evitar que se ejecute dos veces
+
             imageModal.style.display = 'none';
             document.body.style.overflow = 'auto';
             currentImageData = null;
@@ -1044,6 +1224,13 @@
             
             translatingStatus.style.display = 'none';
             translatedStatus.style.display = 'none';
+            relatedImagesGrid.innerHTML = ''; // Limpiamos relacionadas
+
+            // --- NUEVO: Limpiar el historial si se cerró manualmente (Ej. con el botón X o tecla ESC) ---
+            if (fromHistory !== true) {
+                history.back();
+            }
+            // -------------------------------------------------------------------------------------------
         }
 
         function isNearBottom() {
@@ -1060,7 +1247,6 @@
             currentPage++;
 
             const r34Items = await fetchRule34Posts();
-            
             const combinedItems = [...r34Items];
             
             if (combinedItems.length > 0) {
@@ -1118,7 +1304,6 @@
                 skeleton.className = 'skeleton';
                 card.appendChild(skeleton);
 
-                // Siempre creamos una etiqueta <img> y usamos la miniatura (preview_url / sample_url)
                 let gridUrl = fixImageUrl(post.preview_url || post.sample_url || post.file_url);
                 let mediaEl = document.createElement('img');
                 mediaEl.className = 'image-result';
@@ -1127,7 +1312,6 @@
                 
                 mediaEl.onload = () => skeleton.remove();
                 mediaEl.onerror = () => {
-                     // Si falla, intentamos cargar el original (file_url) a menos que sea un vídeo
                      const fallback = fixImageUrl(post.file_url);
                      if (fallback && fallback !== gridUrl && !isVideo) {
                          mediaEl.src = fallback;
@@ -1199,11 +1383,22 @@
         }
 
         // Event Listeners
-        closeArrowBtn.addEventListener('click', closeImageModal);
+        closeArrowBtn.addEventListener('click', () => closeImageModal());
         imageModal.addEventListener('click', (e) => { if (e.target === imageModal) closeImageModal(); });
         document.getElementById('tagsSection').addEventListener('click', (e) => e.stopPropagation());
+        document.getElementById('relatedImagesSection').addEventListener('click', (e) => e.stopPropagation());
         modalMediaContainer.addEventListener('click', (e) => e.stopPropagation());
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeImageModal(); });
+
+        // --- NUEVO: Detectar cuando se usa el botón/gesto de retroceder del dispositivo ---
+        window.addEventListener('popstate', () => {
+            if (imageModal.style.display === 'block') {
+                closeImageModal(true);
+            }
+        });
+        // -----------------------------------------------------------------------------------
+
+        showMoreTagsBtn.addEventListener('click', toggleTagsExpanded);
 
         pinBtn.addEventListener('click', async () => {
             const searchText = searchInput.value.trim();
@@ -1234,6 +1429,7 @@
             }
         });
 
+        // SCROLL INFINITO PARA LA PANTALLA PRINCIPAL
         let scrollTimeout;
         window.addEventListener('scroll', () => {
             clearTimeout(scrollTimeout);
@@ -1242,14 +1438,25 @@
             }, 200);
         });
 
+        // SCROLL INFINITO DENTRO DEL MODAL (PARA RELACIONADAS)
+        let modalScrollTimeout;
+        imageModal.addEventListener('scroll', () => {
+            clearTimeout(modalScrollTimeout);
+            modalScrollTimeout = setTimeout(() => {
+                if (imageModal.style.display === 'block') {
+                    const { scrollTop, scrollHeight, clientHeight } = imageModal;
+                    // Detecta si estamos cerca del final del modal
+                    if (scrollHeight - scrollTop <= clientHeight + 350) {
+                        fetchAndAppendRelatedImages();
+                    }
+                }
+            }, 200);
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             loadSavedTags();
-            
-            // Cargar etiquetas populares
             loadPopularTags();
-            
-            // Inicia buscando TODO lo reciente (string vacío)
-            startSearch('');
+            startSearch(''); // Inicia buscando TODO lo reciente
         });
     </script>
 </body>
