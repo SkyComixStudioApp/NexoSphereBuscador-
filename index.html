@@ -185,7 +185,7 @@
             fill: currentColor;
         }
 
-        /* BOTONES DE TIPO (TODO, IMAGENES, VIDEOS) - Espaciado reducido a 5px */
+        /* BOTONES DE TIPO (TODO, IMAGENES, VIDEOS) */
         .type-filters {
             display: flex;
             justify-content: center;
@@ -218,19 +218,6 @@
             background-color: #333;
         }
 
-        /* TEXTO DE ETIQUETAS RECOMENDADAS */
-        .recommended-tags-text {
-            font-size: 11px;
-            color: #888;
-            margin-bottom: 10px;
-            text-align: left;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            border-left: 3px solid #ff4d4d;
-            padding-left: 8px;
-        }
-
         .search-options {
             display: flex;
             flex-wrap: wrap;
@@ -255,19 +242,27 @@
             transform: translateY(-1px);
         }
         
-        /* CUADRÍCULA */
+        /* CUADRÍCULA - ACTUALIZADO A MASONRY FLEX */
         .results-wrapper {
             max-width: 1800px;
             margin: 0 auto;
             padding: 15px 15px 20px 15px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
             gap: 12px;
+        }
+
+        .masonry-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
         }
         
         .image-card {
             width: 100%;
-            aspect-ratio: 4 / 5;
             border-radius: 10px;
             overflow: hidden;
             background-color: #0a0a0a;
@@ -278,13 +273,16 @@
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 0.5s forwards;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* ETIQUETA DE TIPO (VIDEO/IMAGEN) */
+        /* ETIQUETA DE TIPO (VIDEO/IMAGEN) - AHORA EN LA PARTE INFERIOR CENTRAL */
         .type-badge {
             position: absolute;
-            top: 8px;
-            right: 8px;
+            bottom: 8px; /* Cambiado a inferior */
+            left: 50%;   /* Empieza al 50% */
+            transform: translateX(-50%); /* Ajuste fino para centrar perfectamente */
             background-color: rgba(0, 0, 0, 0.7);
             color: #fff;
             padding: 2px 6px;
@@ -327,7 +325,9 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            position: relative;
+            position: absolute; /* Ajustado para Masonry */
+            top: 0;
+            left: 0;
             z-index: 2;
             opacity: 1;
             transition: opacity 0.3s ease;
@@ -447,7 +447,6 @@
             font-size: 11px;
         }
 
-        /* Nuevo Recuadro de Etiquetas Integrado */
         .tags-box {
             background-color: #0f0f0f;
             border: 1px solid #222;
@@ -455,7 +454,7 @@
             margin-bottom: 15px;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Evita que el botón rompa las esquinas del recuadro */
+            overflow: hidden;
         }
 
         .tags-list-container {
@@ -466,16 +465,15 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            max-height: 65px; /* Altura para aprox. 2 filas de etiquetas */
+            max-height: 65px;
             overflow: hidden;
             transition: max-height 0.4s ease-in-out;
         }
 
         .tags-list.expanded {
-            max-height: 1500px; /* Suficiente para expandir todas */
+            max-height: 1500px;
         }
 
-        /* Botón como barra inferior */
         .show-more-tags-btn {
             background-color: #161616;
             color: #4a90e2;
@@ -486,7 +484,7 @@
             font-size: 13px;
             font-weight: bold;
             cursor: pointer;
-            display: none; /* Se oculta por defecto si hay pocas etiquetas */
+            display: none;
             transition: background-color 0.3s ease;
             text-align: center;
         }
@@ -547,7 +545,7 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* SECCIÓN IMÁGENES RELACIONADAS */
+        /* SECCIÓN IMÁGENES RELACIONADAS - DISEÑO MASONRY */
         .related-images-section {
             width: 100%;
             max-width: 1000px;
@@ -567,20 +565,34 @@
             gap: 8px;
         }
 
+        /* Adaptado de grid a un contenedor flex compatible con el estilo masonry */
         .related-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
             gap: 10px;
+            width: 100%;
+        }
+
+        /* Columnas para el sistema Masonry de las imágenes relacionadas */
+        .related-masonry-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
         }
 
         .related-loading-indicator {
-            grid-column: 1 / -1;
+            width: 100%;
             text-align: center;
             padding: 15px;
             color: #4a90e2;
             font-size: 13px;
             display: none;
+            margin-top: 10px;
         }
+        
         .related-loading-indicator.active {
             display: block;
         }
@@ -595,11 +607,9 @@
             display: none;
             font-weight: bold;
             text-transform: uppercase;
-            grid-column: 1 / -1;
         }
         
         .load-more-indicator {
-            grid-column: 1 / -1;
             text-align: center;
             padding: 20px;
             color: #4a90e2;
@@ -625,7 +635,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         
         .no-more-results {
-            grid-column: 1 / -1;
             text-align: center;
             padding: 30px;
             color: #aaa;
@@ -638,12 +647,13 @@
         }
 
         @media (min-width: 768px) {
-            .results-wrapper { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; padding: 20px 25px; }
-            .related-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .results-wrapper { gap: 16px; padding: 20px 25px; }
+            .masonry-column { gap: 16px; }
         }
 
         @media (min-width: 1024px) {
-            .results-wrapper { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px; }
+            .results-wrapper { gap: 20px; }
+            .masonry-column { gap: 20px; }
             .logo { height: 42px; }
             .logo-bar { padding: 12px 25px; }
             .modal-tag { font-size: 13px; padding: 7px 16px; max-width: 260px; }
@@ -651,7 +661,8 @@
         }
 
         @media (min-width: 1440px) {
-            .results-wrapper { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 24px; }
+            .results-wrapper { gap: 24px; }
+            .masonry-column { gap: 24px; }
             .search-filters-panel.visible { max-height: 600px; }
             .search-box { font-size: 16px; padding: 12px 18px 12px 45px; }
             .search-icon { width: 18px; left: 15px; }
@@ -660,7 +671,8 @@
         }
 
         @media (min-width: 1800px) {
-            .results-wrapper { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 28px; }
+            .results-wrapper { gap: 28px; }
+            .masonry-column { gap: 28px; }
         }
     </style>
 </head>
@@ -690,10 +702,6 @@
                     <button class="type-btn" data-type="image">Imágenes</button>
                     <button class="type-btn" data-type="video">Vídeos</button>
                 </div>
-                
-                <div class="recommended-tags-text">
-                    ETIQUETAS RECOMENDADAS
-                </div>
 
                 <div class="search-options" id="searchOptions">
                 </div>
@@ -715,7 +723,7 @@
             <div class="tags-section" id="tagsSection">
                 <div class="tags-header">
                     <span>
-                        🏷️ Etiquetas de la imagen 
+                        🏷️ Etiquetas
                         <span class="tags-count" id="tagsCount">0</span>
                     </span>
                 </div>
@@ -801,33 +809,74 @@
         let endOfRelatedResults = false;
         let currentRelatedSearchTags = '';
 
-        // ARREGLO ETIQUETAS: Cargar botones con etiquetas predefinidas recomendadas
-        function loadPopularTags() {
-            searchOptions.innerHTML = '';
-            if (savedTags.length > 0) renderSavedTags(); 
-            
-            const recommendedTags = [
-                { name: '', display: 'Más Reciente' },
-                { name: 'disney', display: 'Disney' },
-                { name: 'femboy', display: 'Femboys' },
-                { name: 'furry', display: 'Furry' }
-            ];
-
-            recommendedTags.forEach(tagData => {
-                if (!savedTags.some(t => t.tag === tagData.name)) {
-                    const tagElement = document.createElement('div');
-                    tagElement.className = 'option';
-                    tagElement.textContent = tagData.display;
-                    tagElement.dataset.tag = tagData.name;
-                    tagElement.addEventListener('click', () => {
-                        searchInput.value = tagData.name !== '' ? tagData.display : '';
-                        startSearch(tagData.name);
-                        if (isSearchVisible) toggleSearchVisibility();
-                    });
-                    searchOptions.appendChild(tagElement);
-                }
-            });
+        // --- FUNCIONES MASONRY JS ---
+        function getColCount() {
+            if (window.innerWidth >= 1800) return 7;
+            if (window.innerWidth >= 1440) return 6;
+            if (window.innerWidth >= 1024) return 5;
+            if (window.innerWidth >= 768) return 4;
+            return 3; // 3 columnas para dispositivos móviles
         }
+
+        function setupMasonryColumns() {
+            resultsContainer.innerHTML = '';
+            const colCount = getColCount();
+            for (let i = 0; i < colCount; i++) {
+                const col = document.createElement('div');
+                col.className = 'masonry-column';
+                resultsContainer.appendChild(col);
+            }
+        }
+
+        function getShortestColumn() {
+            const cols = resultsContainer.querySelectorAll('.masonry-column');
+            if (cols.length === 0) return null;
+            let shortest = cols[0];
+            let minHeight = shortest.offsetHeight;
+            for(let i = 1; i < cols.length; i++) {
+                if (cols[i].offsetHeight < minHeight) {
+                    minHeight = cols[i].offsetHeight;
+                    shortest = cols[i];
+                }
+            }
+            return shortest;
+        }
+
+        // --- FUNCIONES MASONRY PARA IMÁGENES RELACIONADAS ---
+        function getRelatedColCount() {
+            if (window.innerWidth >= 1024) return 5;
+            if (window.innerWidth >= 768) return 4;
+            return 3; 
+        }
+
+        function setupRelatedMasonryColumns() {
+            relatedImagesGrid.innerHTML = '';
+            const colCount = getRelatedColCount();
+            for (let i = 0; i < colCount; i++) {
+                const col = document.createElement('div');
+                col.className = 'related-masonry-column';
+                relatedImagesGrid.appendChild(col);
+            }
+        }
+
+        function getShortestRelatedColumn() {
+            const cols = relatedImagesGrid.querySelectorAll('.related-masonry-column');
+            if (cols.length === 0) return null;
+            let shortest = cols[0];
+            let minHeight = shortest.offsetHeight;
+            for(let i = 1; i < cols.length; i++) {
+                if (cols[i].offsetHeight < minHeight) {
+                    minHeight = cols[i].offsetHeight;
+                    shortest = cols[i];
+                }
+            }
+            return shortest;
+        }
+        // ------------------------------
+
+        // NOTA: Se eliminó loadPopularTags() a petición.
+        // Ahora solo las etiquetas guardadas / fijadas de forma manual 
+        // aparecerán en el panel del buscador, mejorando la limpieza.
 
         function toggleSearchVisibility() {
             isSearchVisible = !isSearchVisible;
@@ -860,20 +909,19 @@
         }
 
         function renderSavedTags() {
-            if (searchOptions.innerHTML === '') {
-                savedTags.forEach(t => {
-                    const tagElement = document.createElement('div');
-                    tagElement.className = 'option';
-                    tagElement.textContent = t.display;
-                    tagElement.dataset.tag = t.tag;
-                    tagElement.addEventListener('click', () => {
-                        searchInput.value = t.display;
-                        startSearch(t.tag);
-                        if (isSearchVisible) toggleSearchVisibility();
-                    });
-                    searchOptions.appendChild(tagElement);
+            searchOptions.innerHTML = '';
+            savedTags.forEach(t => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'option';
+                tagElement.textContent = t.display;
+                tagElement.dataset.tag = t.tag;
+                tagElement.addEventListener('click', () => {
+                    searchInput.value = t.display;
+                    startSearch(t.tag);
+                    if (isSearchVisible) toggleSearchVisibility();
                 });
-            }
+                searchOptions.appendChild(tagElement);
+            });
         }
 
         function addSavedTag(tag, display) {
@@ -972,7 +1020,7 @@
             return await fetchBooruPosts('https://api.rule34.xxx/index.php', R34_API_KEY, R34_USER_ID, currentTags, currentPage, 10);
         }
 
-        // FUNCIÓN PARA BUSCAR IMÁGENES RELACIONADAS EN EL MODAL (Ahora escoge tags aleatorios e inicializa scroll)
+        // FUNCIÓN PARA BUSCAR IMÁGENES RELACIONADAS EN EL MODAL
         async function loadRelatedImages(tagsString) {
             relatedImagesGrid.innerHTML = '';
             relatedCurrentPage = 0;
@@ -981,27 +1029,102 @@
             currentRelatedSearchTags = '';
 
             if (!tagsString) {
-                relatedImagesGrid.innerHTML = '<div style="color:#aaa; text-align:center; grid-column:1/-1; padding: 15px;">No hay datos para relacionar.</div>';
+                relatedImagesGrid.innerHTML = '<div style="color:#aaa; text-align:center; flex:1; padding: 15px;">No hay datos para relacionar.</div>';
                 return;
             }
 
-            // Filtramos etiquetas que no sirven para buscar relacionados
             const arr = tagsString.split(' ').filter(t => t.trim() !== '' && t !== 'video' && t !== 'animated' && t !== 'sound');
             
             if(arr.length === 0) {
-                relatedImagesGrid.innerHTML = '<div style="color:#aaa; text-align:center; grid-column:1/-1; padding: 15px;">No hay etiquetas útiles para relacionar.</div>';
+                relatedImagesGrid.innerHTML = '<div style="color:#aaa; text-align:center; flex:1; padding: 15px;">No hay etiquetas útiles para relacionar.</div>';
                 return;
             }
 
-            // Mezclamos (shuffle) el array para que agarre etiquetas aleatorias de la imagen
             const shuffled = arr.sort(() => 0.5 - Math.random());
-            // Seleccionamos hasta 2 etiquetas aleatorias
             currentRelatedSearchTags = shuffled.slice(0, Math.min(2, shuffled.length)).join(' ');
 
+            // Inicializar las columnas masonry antes de cargar
+            setupRelatedMasonryColumns();
             await fetchAndAppendRelatedImages();
         }
 
-        // NUEVA FUNCIÓN: Agregar imágenes relacionadas para el scroll infinito
+        // Generar una tarjeta para la sección relacionada manteniendo el diseño Masonry
+        function createRelatedImageCard(post, index) {
+            return new Promise((resolve) => {
+                if (!post) { resolve(); return; }
+                
+                const fileUrl = fixImageUrl(post.file_url);
+                if (!fileUrl) { resolve(); return; }
+
+                const ext = fileUrl.split('.').pop().split('?')[0].toLowerCase();
+                const isVideo = ext === 'mp4' || ext === 'webm';
+                const isGif = ext === 'gif';
+
+                const card = document.createElement('div');
+                card.className = 'image-card';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.style.opacity = '0';
+                card.style.animation = 'fadeInUp 0.5s forwards';
+                
+                // Aplicar el mismo cálculo de relación de aspecto que la galería principal
+                if (post.width && post.height) {
+                    card.style.aspectRatio = `${post.width} / ${post.height}`;
+                } else {
+                    card.style.aspectRatio = '4 / 5'; 
+                }
+
+                if (isVideo || isGif) {
+                    const badge = document.createElement('div');
+                    badge.className = 'type-badge video-badge';
+                    badge.textContent = 'VÍDEO';
+                    card.appendChild(badge);
+                } else {
+                    const badge = document.createElement('div');
+                    badge.className = 'type-badge';
+                    badge.textContent = 'IMAGEN';
+                    card.appendChild(badge);
+                }
+
+                const skeleton = document.createElement('div');
+                skeleton.className = 'skeleton';
+                card.appendChild(skeleton);
+
+                let gridUrl = fixImageUrl(post.preview_url || post.sample_url || post.file_url);
+                let mediaEl = document.createElement('img');
+                mediaEl.className = 'image-result';
+                mediaEl.loading = 'lazy';
+                mediaEl.src = gridUrl;
+                
+                mediaEl.onload = () => skeleton.remove();
+                mediaEl.onerror = () => { 
+                    const fallback = fixImageUrl(post.file_url);
+                    if (fallback && fallback !== gridUrl && !isVideo) {
+                        mediaEl.src = fallback;
+                        return;
+                    }
+                    card.style.display = 'none'; 
+                };
+                
+                card.addEventListener('click', () => {
+                    const imageData = { imgUrl: fileUrl, tags: post.tags || '' };
+                    openImageModal(imageData); 
+                });
+                
+                card.appendChild(mediaEl);
+                
+                // Añadir a la columna más corta (Masonry adaptado)
+                const shortestCol = getShortestRelatedColumn();
+                if (shortestCol) {
+                    shortestCol.appendChild(card);
+                } else {
+                    relatedImagesGrid.appendChild(card);
+                }
+                
+                resolve();
+            });
+        }
+
+        // Agregar imágenes relacionadas para el scroll infinito
         async function fetchAndAppendRelatedImages() {
             if (isFetchingRelated || endOfRelatedResults || !currentRelatedSearchTags) return;
             
@@ -1015,46 +1138,13 @@
             if (relatedPosts.length === 0) {
                 endOfRelatedResults = true;
                 if (relatedCurrentPage === 0) {
-                    relatedImagesGrid.innerHTML = '<div style="color:#aaa; text-align:center; grid-column:1/-1; padding: 15px;">No se encontraron relacionados.</div>';
+                    relatedImagesGrid.innerHTML = '<div style="color:#aaa; text-align:center; flex:1; padding: 15px;">No se encontraron relacionados.</div>';
                 }
             } else {
-                relatedPosts.forEach((post, index) => {
-                    const fileUrl = fixImageUrl(post.file_url);
-                    if (!fileUrl) return;
-
-                    const ext = fileUrl.split('.').pop().split('?')[0].toLowerCase();
-                    const isVideo = ext === 'mp4' || ext === 'webm';
-                    const isGif = ext === 'gif';
-
-                    const card = document.createElement('div');
-                    card.className = 'image-card';
-                    card.style.animationDelay = `${index * 0.05}s`;
-                    card.style.opacity = '0';
-                    card.style.animation = 'fadeInUp 0.5s forwards';
-
-                    if (isVideo || isGif) {
-                        const badge = document.createElement('div');
-                        badge.className = 'type-badge video-badge';
-                        badge.textContent = 'VÍDEO';
-                        card.appendChild(badge);
-                    }
-
-                    let gridUrl = fixImageUrl(post.preview_url || post.sample_url || post.file_url);
-                    let mediaEl = document.createElement('img');
-                    mediaEl.className = 'image-result';
-                    mediaEl.loading = 'lazy';
-                    mediaEl.src = gridUrl;
-                    
-                    mediaEl.onerror = () => { card.style.display = 'none'; };
-                    
-                    card.addEventListener('click', () => {
-                        const imageData = { imgUrl: fileUrl, tags: post.tags || '' };
-                        openImageModal(imageData); // Carga la nueva imagen en el modal
-                    });
-                    
-                    card.appendChild(mediaEl);
-                    relatedImagesGrid.appendChild(card);
-                });
+                for (let i = 0; i < relatedPosts.length; i++) {
+                    await createRelatedImageCard(relatedPosts[i], i);
+                    await new Promise(resolve => setTimeout(resolve, 20)); // Retraso para columnas fluidas
+                }
                 relatedCurrentPage++;
             }
             isFetchingRelated = false;
@@ -1074,7 +1164,6 @@
         }
 
         function checkTagsOverflow(count) {
-            // Asumimos que más de 8-10 etiquetas ya desbordan el cuadro pequeño visualmente
             if (count > 8) {
                 showMoreTagsBtn.style.display = 'block';
             } else {
@@ -1163,12 +1252,9 @@
             currentImageData = imageData;
             modalMediaContainer.innerHTML = '';
             
-            // --- NUEVO: Control de historial (Para que el botón de retroceso cierre el modal) ---
-            // Solo creamos un estado nuevo si el modal estaba cerrado, para evitar problemas al saltar entre imágenes relacionadas
             if (imageModal.style.display !== 'block') {
                 history.pushState({ modalOpen: true }, "");
             }
-            // ----------------------------------------------------------------------------------
 
             const ext = imageData.imgUrl.split('.').pop().split('?')[0].toLowerCase();
             const isVideo = ext === 'mp4' || ext === 'webm';
@@ -1197,18 +1283,18 @@
             
             if (imageData.tags) {
                 displayTags(imageData.tags);
-                loadRelatedImages(imageData.tags); // Inicia la carga de relacionados aleatorios
+                loadRelatedImages(imageData.tags); 
                 setTimeout(() => startAutoTranslation(), 500);
             } else {
                 displayTags('');
                 loadRelatedImages('');
             }
             
-            imageModal.scrollTop = 0; // Subir al inicio al abrir/cambiar
+            imageModal.scrollTop = 0; 
         }
 
         function closeImageModal(fromHistory = false) {
-            if (imageModal.style.display !== 'block') return; // Evitar que se ejecute dos veces
+            if (imageModal.style.display !== 'block') return; 
 
             imageModal.style.display = 'none';
             document.body.style.overflow = 'auto';
@@ -1224,13 +1310,11 @@
             
             translatingStatus.style.display = 'none';
             translatedStatus.style.display = 'none';
-            relatedImagesGrid.innerHTML = ''; // Limpiamos relacionadas
+            relatedImagesGrid.innerHTML = ''; 
 
-            // --- NUEVO: Limpiar el historial si se cerró manualmente (Ej. con el botón X o tecla ESC) ---
             if (fromHistory !== true) {
                 history.back();
             }
-            // -------------------------------------------------------------------------------------------
         }
 
         function isNearBottom() {
@@ -1285,6 +1369,13 @@
                 card.className = 'image-card';
                 card.style.animationDelay = `${index * 0.05}s`;
                 
+                // MASONRY: Asignar altura según el ratio de la imagen dinámicamente
+                if (post.width && post.height) {
+                    card.style.aspectRatio = `${post.width} / ${post.height}`;
+                } else {
+                    card.style.aspectRatio = '4 / 5'; // Caída de respaldo
+                }
+                
                 const badge = document.createElement('div');
                 badge.className = 'type-badge';
                 if (isVideo || isGif) {
@@ -1329,7 +1420,14 @@
                 });
                 
                 card.appendChild(mediaEl);
-                resultsContainer.appendChild(card);
+                
+                // MASONRY: Añadir a la columna más corta en vez del contenedor principal
+                const shortestCol = getShortestColumn();
+                if (shortestCol) {
+                    shortestCol.appendChild(card);
+                } else {
+                    resultsContainer.appendChild(card);
+                }
                 resolve();
             });
         }
@@ -1338,7 +1436,7 @@
             for (let i = 0; i < posts.length; i++) {
                 if (activeSearchId === null) break; 
                 await createImageCard(posts[i], i);
-                await new Promise(resolve => setTimeout(resolve, 20));
+                await new Promise(resolve => setTimeout(resolve, 20)); // Retraso para calcular alturas correctamente
             }
         }
 
@@ -1355,7 +1453,7 @@
             if (isNewSearch) {
                 currentPage = 0;
                 endOfAllResults = false;
-                resultsContainer.innerHTML = '';
+                setupMasonryColumns(); // INICIALIZA LAS COLUMNAS
                 allPosts = [];
                 isAutoLoadEnabled = true;
                 currentTags = formatSearchText(tags);
@@ -1375,7 +1473,7 @@
                     }
                 }, 500);
             } else if (isNewSearch && activeSearchId === searchId) {
-                resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #aaa; padding: 40px 0;">No se encontró nada reciente.</p>';
+                resultsContainer.innerHTML = '<p style="width: 100%; text-align: center; color: #aaa; padding: 40px 0;">No se encontró nada reciente.</p>';
             }
 
             scrollLoading.style.display = 'none';
@@ -1390,13 +1488,11 @@
         modalMediaContainer.addEventListener('click', (e) => e.stopPropagation());
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeImageModal(); });
 
-        // --- NUEVO: Detectar cuando se usa el botón/gesto de retroceder del dispositivo ---
         window.addEventListener('popstate', () => {
             if (imageModal.style.display === 'block') {
                 closeImageModal(true);
             }
         });
-        // -----------------------------------------------------------------------------------
 
         showMoreTagsBtn.addEventListener('click', toggleTagsExpanded);
 
@@ -1445,7 +1541,6 @@
             modalScrollTimeout = setTimeout(() => {
                 if (imageModal.style.display === 'block') {
                     const { scrollTop, scrollHeight, clientHeight } = imageModal;
-                    // Detecta si estamos cerca del final del modal
                     if (scrollHeight - scrollTop <= clientHeight + 350) {
                         fetchAndAppendRelatedImages();
                     }
@@ -1455,7 +1550,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadSavedTags();
-            loadPopularTags();
             startSearch(''); // Inicia buscando TODO lo reciente
         });
     </script>
