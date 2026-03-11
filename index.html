@@ -190,7 +190,7 @@
             display: flex;
             justify-content: center;
             gap: 5px; 
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             width: 100%;
         }
 
@@ -216,6 +216,71 @@
 
         .type-btn:hover:not(.active) {
             background-color: #333;
+        }
+
+        /* FILTRO ANTI IA */
+        .ai-filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 0 5px;
+        }
+
+        .ai-filter-label {
+            font-size: 13px;
+            color: #ccc;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 22px;
+            border: 1px solid #444;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #aaa;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: rgba(255, 77, 77, 0.2);
+            border-color: #ff4d4d;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+            background-color: #ff4d4d;
         }
 
         .search-options {
@@ -703,6 +768,14 @@
                     <button class="type-btn" data-type="video">Vídeos</button>
                 </div>
 
+                <div class="ai-filter-container">
+                    <span class="ai-filter-label">OCULTAR GENERADO POR IA</span>
+                    <label class="switch">
+                        <input type="checkbox" id="aiFilterToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
                 <div class="search-options" id="searchOptions">
                 </div>
             </div>
@@ -787,6 +860,7 @@
         const showMoreTagsBtn = document.getElementById('showMoreTagsBtn');
         const relatedImagesGrid = document.getElementById('relatedImagesGrid');
         const relatedLoadingIndicator = document.getElementById('relatedLoadingIndicator');
+        const aiFilterToggle = document.getElementById('aiFilterToggle');
         
         let currentPage = 0;
         let currentTags = '';
@@ -995,10 +1069,16 @@
         async function fetchBooruPosts(baseUrl, apiKey, userId, tags, page, customLimit = 10) {
             let finalTags = tags ? tags.trim() : '';
             
+            // Filtros de Tipo
             if (currentTypeFilter === 'image') {
                 finalTags += ' -video -animated';
             } else if (currentTypeFilter === 'video') {
                 finalTags = finalTags ? `${finalTags} video` : 'video';
+            }
+
+            // Filtro Anti IA
+            if (aiFilterToggle && aiFilterToggle.checked) {
+                finalTags = finalTags ? `${finalTags} -ai_generated` : '-ai_generated';
             }
 
             const tagsParam = finalTags ? `&tags=${encodeURIComponent(finalTags)}` : '';
@@ -1547,6 +1627,12 @@
             });
         });
 
+        // Event listener para el interruptor Anti IA (MODIFICADO)
+        aiFilterToggle.addEventListener('change', () => {
+            localStorage.setItem('noxesphare_ai_filter', aiFilterToggle.checked);
+            startSearch(searchInput.value.trim() || currentTags);
+        });
+
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 startSearch(searchInput.value.trim());
@@ -1577,6 +1663,13 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadSavedTags();
+            
+            // Cargar el estado guardado del filtro Anti IA
+            const savedAIFilter = localStorage.getItem('noxesphare_ai_filter');
+            if (savedAIFilter === 'true') {
+                aiFilterToggle.checked = true;
+            }
+
             startSearch(''); 
         });
     </script>
