@@ -12,10 +12,10 @@
             -webkit-tap-highlight-color: transparent !important; 
         }
         
-        /* Importar fuente personalizada */
+        /* Importar fuente personalizada local */
         @font-face {
             font-family: 'CustomFont';
-            src: url('https://res.cloudinary.com/dcxfj6ij9/raw/upload/v1708493518/XWallpaper/Fuente/mohnlubogt1mepgeifcn.ttf') format('truetype');
+            src: url('Fuente/Champagne y limusinas Bold.ttf') format('truetype');
             font-display: swap;
         }
         
@@ -307,7 +307,7 @@
             transform: translateY(-1px);
         }
         
-        /* CUADRÍCULA - ACTUALIZADO A MASONRY FLEX */
+        /* CUADRÍCULA - COLUMNAS FIJAS */
         .results-wrapper {
             max-width: 1800px;
             margin: 0 auto;
@@ -342,12 +342,12 @@
             flex-direction: column;
         }
 
-        /* ETIQUETA DE TIPO (VIDEO/IMAGEN) - AHORA EN LA PARTE INFERIOR CENTRAL */
+        /* ETIQUETA DE TIPO (VIDEO/IMAGEN) */
         .type-badge {
             position: absolute;
-            bottom: 8px; /* Cambiado a inferior */
-            left: 50%;   /* Empieza al 50% */
-            transform: translateX(-50%); /* Ajuste fino para centrar perfectamente */
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
             background-color: rgba(0, 0, 0, 0.7);
             color: #fff;
             padding: 2px 6px;
@@ -390,7 +390,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            position: absolute; /* Ajustado para Masonry */
+            position: absolute;
             top: 0;
             left: 0;
             z-index: 2;
@@ -610,7 +610,7 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* SECCIÓN IMÁGENES RELACIONADAS - DISEÑO MASONRY */
+        /* SECCIÓN IMÁGENES RELACIONADAS */
         .related-images-section {
             width: 100%;
             max-width: 1000px;
@@ -630,7 +630,6 @@
             gap: 8px;
         }
 
-        /* Adaptado de grid a un contenedor flex compatible con el estilo masonry */
         .related-grid {
             display: flex;
             flex-direction: row;
@@ -639,7 +638,6 @@
             width: 100%;
         }
 
-        /* Columnas para el sistema Masonry de las imágenes relacionadas */
         .related-masonry-column {
             flex: 1;
             display: flex;
@@ -711,14 +709,8 @@
             display: block;
         }
 
-        @media (min-width: 768px) {
-            .results-wrapper { gap: 16px; padding: 20px 25px; }
-            .masonry-column { gap: 16px; }
-        }
-
+        /* MEDIA QUERIES SOLAMENTE PARA ELEMENTOS DE LA UI QUE NO SON LA GALERÍA */
         @media (min-width: 1024px) {
-            .results-wrapper { gap: 20px; }
-            .masonry-column { gap: 20px; }
             .logo { height: 42px; }
             .logo-bar { padding: 12px 25px; }
             .modal-tag { font-size: 13px; padding: 7px 16px; max-width: 260px; }
@@ -726,24 +718,17 @@
         }
 
         @media (min-width: 1440px) {
-            .results-wrapper { gap: 24px; }
-            .masonry-column { gap: 24px; }
             .search-filters-panel.visible { max-height: 600px; }
             .search-box { font-size: 16px; padding: 12px 18px 12px 45px; }
             .search-icon { width: 18px; left: 15px; }
             .pin-btn { right: 15px; }
             .option { padding: 8px 18px; font-size: 13px; }
         }
-
-        @media (min-width: 1800px) {
-            .results-wrapper { gap: 28px; }
-            .masonry-column { gap: 28px; }
-        }
     </style>
 </head>
 <body>
     <div class="logo-bar">
-        <img src="https://i.ibb.co/G45CqGfQ/IMG-20260317-175523.png" alt="Logo" class="logo">
+        <img src="https://i.ibb.co/qYhKY4cy/IMG-20260326-171237.png" alt="Logo" class="logo">
         <button class="search-toggle-btn" id="searchToggleBtn" title="Mostrar buscador">
             <img src="https://i.ibb.co/n84F5wwC/lupa.png" alt="Buscar" class="search-toggle-icon">
         </button>
@@ -887,17 +872,9 @@
         let currentRelatedSearchTags = '';
 
         // --- FUNCIONES MASONRY JS ---
-        function getColCount() {
-            if (window.innerWidth >= 1800) return 7;
-            if (window.innerWidth >= 1440) return 6;
-            if (window.innerWidth >= 1024) return 5;
-            if (window.innerWidth >= 768) return 4;
-            return 3; 
-        }
-
         function setupMasonryColumns() {
             resultsContainer.innerHTML = '';
-            const colCount = getColCount();
+            const colCount = 2; // Columnas fijas
             for (let i = 0; i < colCount; i++) {
                 const col = document.createElement('div');
                 col.className = 'masonry-column';
@@ -920,15 +897,9 @@
         }
 
         // --- FUNCIONES MASONRY PARA IMÁGENES RELACIONADAS ---
-        function getRelatedColCount() {
-            if (window.innerWidth >= 1024) return 5;
-            if (window.innerWidth >= 768) return 4;
-            return 3; 
-        }
-
         function setupRelatedMasonryColumns() {
             relatedImagesGrid.innerHTML = '';
-            const colCount = getRelatedColCount();
+            const colCount = 2; // Columnas fijas
             for (let i = 0; i < colCount; i++) {
                 const col = document.createElement('div');
                 col.className = 'related-masonry-column';
@@ -1573,7 +1544,7 @@
             isFetching = false;
         }
 
-        // LÓGICA DE NAVEGACIÓN Y CIERRE (MODIFICADA)
+        // LÓGICA DE NAVEGACIÓN Y CIERRE
         closeArrowBtn.addEventListener('click', () => {
             // Ir hacia atrás retrocede a la imagen anterior si es que hay historial
             history.back(); 
@@ -1627,7 +1598,6 @@
             });
         });
 
-        // Event listener para el interruptor Anti IA (MODIFICADO)
         aiFilterToggle.addEventListener('change', () => {
             localStorage.setItem('noxesphare_ai_filter', aiFilterToggle.checked);
             startSearch(searchInput.value.trim() || currentTags);
@@ -1664,7 +1634,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadSavedTags();
             
-            // Cargar el estado guardado del filtro Anti IA
             const savedAIFilter = localStorage.getItem('noxesphare_ai_filter');
             if (savedAIFilter === 'true') {
                 aiFilterToggle.checked = true;
