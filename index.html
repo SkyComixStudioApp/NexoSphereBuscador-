@@ -1560,8 +1560,8 @@
                 <div class="type-filters">
                     <button class="type-btn active" data-type="all">Todo</button>
                     <button class="type-btn" data-type="image">Imágenes</button>
-                    <button class="type-btn" data-type="gif">GIF</button>
                     <button class="type-btn" data-type="video">Vídeos</button>
+                    <button class="type-btn" data-type="gif">GIFs</button>
                 </div>
 
                 <div class="ai-filter-container">
@@ -1924,10 +1924,10 @@
             // Filtros de Tipo
             if (currentTypeFilter === 'image') {
                 finalTags += ' -video -animated';
-            } else if (currentTypeFilter === 'gif') {
-                finalTags = finalTags ? `${finalTags} gif` : 'gif';
             } else if (currentTypeFilter === 'video') {
                 finalTags = finalTags ? `${finalTags} video` : 'video';
+            } else if (currentTypeFilter === 'gif') {
+                finalTags = finalTags ? `${finalTags} animated` : 'animated';
             }
 
             // Filtro Anti IA
@@ -1991,6 +1991,11 @@
                 const isVideo = ext === 'mp4' || ext === 'webm';
                 const isGif = ext === 'gif';
 
+                if (currentTypeFilter === 'gif' && !isGif) {
+                    resolve();
+                    return;
+                }
+
                 const card = document.createElement('div');
                 card.className = 'image-card';
                 card.style.animationDelay = `${index * 0.05}s`;
@@ -2003,15 +2008,15 @@
                     card.style.aspectRatio = '4 / 5'; 
                 }
 
-                if (isVideo) {
-                    const badge = document.createElement('div');
-                    badge.className = 'type-badge video-badge';
-                    badge.textContent = 'VÍDEO';
-                    card.appendChild(badge);
-                } else if (isGif) {
+                if (isGif) {
                     const badge = document.createElement('div');
                     badge.className = 'type-badge video-badge';
                     badge.textContent = 'GIF';
+                    card.appendChild(badge);
+                } else if (isVideo) {
+                    const badge = document.createElement('div');
+                    badge.className = 'type-badge video-badge';
+                    badge.textContent = 'VÍDEO';
                     card.appendChild(badge);
                 } else {
                     const badge = document.createElement('div');
@@ -2324,6 +2329,12 @@
             return url;
         }
 
+        function isGifFile(url) {
+            if (!url) return false;
+            const cleanUrl = url.split('?')[0].toLowerCase();
+            return cleanUrl.endsWith('.gif');
+        }
+
         function createImageCard(post, index) {
             return new Promise((resolve) => {
                 if (!post) { resolve(); return; }
@@ -2334,6 +2345,11 @@
                 const ext = fileUrl.split('.').pop().split('?')[0].toLowerCase();
                 const isVideo = ext === 'mp4' || ext === 'webm';
                 const isGif = ext === 'gif';
+
+                if (currentTypeFilter === 'gif' && !isGif) {
+                    resolve();
+                    return;
+                }
 
                 const card = document.createElement('div');
                 card.className = 'image-card';
@@ -2347,16 +2363,16 @@
                 
                 const badge = document.createElement('div');
                 badge.className = 'type-badge';
-                if (isVideo) {
-                    badge.classList.add('video-badge');
-                    badge.textContent = 'VÍDEO';
-                    if (currentTypeFilter === 'all' || currentTypeFilter === 'video') {
-                        card.appendChild(badge);
-                    }
-                } else if (isGif) {
+                if (isGif) {
                     badge.classList.add('video-badge');
                     badge.textContent = 'GIF';
                     if (currentTypeFilter === 'all' || currentTypeFilter === 'gif') {
+                        card.appendChild(badge);
+                    }
+                } else if (isVideo) {
+                    badge.classList.add('video-badge');
+                    badge.textContent = 'VÍDEO';
+                    if (currentTypeFilter === 'all' || currentTypeFilter === 'video') {
                         card.appendChild(badge);
                     }
                 } else {
