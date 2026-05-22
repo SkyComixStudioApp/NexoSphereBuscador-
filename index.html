@@ -1560,6 +1560,7 @@
                 <div class="type-filters">
                     <button class="type-btn active" data-type="all">Todo</button>
                     <button class="type-btn" data-type="image">Imágenes</button>
+                    <button class="type-btn" data-type="gif">GIF</button>
                     <button class="type-btn" data-type="video">Vídeos</button>
                 </div>
 
@@ -1923,6 +1924,8 @@
             // Filtros de Tipo
             if (currentTypeFilter === 'image') {
                 finalTags += ' -video -animated';
+            } else if (currentTypeFilter === 'gif') {
+                finalTags = finalTags ? `${finalTags} gif` : 'gif';
             } else if (currentTypeFilter === 'video') {
                 finalTags = finalTags ? `${finalTags} video` : 'video';
             }
@@ -2000,10 +2003,15 @@
                     card.style.aspectRatio = '4 / 5'; 
                 }
 
-                if (isVideo || isGif) {
+                if (isVideo) {
                     const badge = document.createElement('div');
                     badge.className = 'type-badge video-badge';
                     badge.textContent = 'VÍDEO';
+                    card.appendChild(badge);
+                } else if (isGif) {
+                    const badge = document.createElement('div');
+                    badge.className = 'type-badge video-badge';
+                    badge.textContent = 'GIF';
                     card.appendChild(badge);
                 } else {
                     const badge = document.createElement('div');
@@ -2339,10 +2347,16 @@
                 
                 const badge = document.createElement('div');
                 badge.className = 'type-badge';
-                if (isVideo || isGif) {
+                if (isVideo) {
                     badge.classList.add('video-badge');
                     badge.textContent = 'VÍDEO';
                     if (currentTypeFilter === 'all' || currentTypeFilter === 'video') {
+                        card.appendChild(badge);
+                    }
+                } else if (isGif) {
+                    badge.classList.add('video-badge');
+                    badge.textContent = 'GIF';
+                    if (currentTypeFilter === 'all' || currentTypeFilter === 'gif') {
                         card.appendChild(badge);
                     }
                 } else {
